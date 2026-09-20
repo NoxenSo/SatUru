@@ -1,0 +1,607 @@
+Improve the existing website without changing its overall design or functionality.
+
+
+
+Keep the current visual style, dark/light mode, language switching and responsive layout.
+
+
+
+Focus on making the website feel like a premium digital studio.
+
+
+
+========================
+
+UI / UX IMPROVEMENTS
+
+========================
+
+
+
+- Increase whitespace throughout the website.
+
+- Improve spacing between sections by approximately 40–60%.
+
+- Make the Hero section more spacious and impactful.
+
+- Improve typography hierarchy.
+
+- Improve button sizes, hover effects and transitions.
+
+- Improve portfolio/project cards with better spacing, hover animations and subtle glow.
+
+- Add subtle scroll animations and micro-interactions.
+
+- Improve the header with a premium glassmorphism effect.
+
+- Keep the overall design minimal and elegant.
+
+
+
+========================
+
+AUTHENTICATION
+
+========================
+
+
+
+Implement a complete authentication system.
+
+
+
+Features:
+
+
+
+- Sign Up
+
+- Sign In
+
+- Sign Out
+
+- Forgot Password UI (backend logic can be mocked if email is unavailable)
+
+- Protected Dashboard
+
+- Persistent login session
+
+
+
+Use:
+
+
+
+- Auth.js (NextAuth) or another modern authentication solution
+
+- Secure password hashing
+
+- Environment variables for secrets
+
+
+
+========================
+
+DATABASE
+
+========================
+
+
+
+Integrate a PostgreSQL database.
+
+
+
+Use Prisma ORM.
+
+
+
+Create proper schema and migrations.
+
+
+
+Models should include at minimum:
+
+
+
+User
+
+- id
+
+- name
+
+- email
+
+- password
+
+- createdAt
+
+
+
+Project
+
+- id
+
+- title
+
+- description
+
+- status
+
+- createdAt
+
+- updatedAt
+
+- userId
+
+
+
+Message
+
+- id
+
+- content
+
+- createdAt
+
+- sender
+
+- projectId
+
+
+
+========================
+
+CLIENT DASHBOARD
+
+========================
+
+
+
+Create a professional client dashboard.
+
+
+
+Sidebar:
+
+
+
+- Dashboard
+
+- My Projects
+
+- Messages
+
+- Profile
+
+- Settings
+
+
+
+Dashboard should include:
+
+
+
+- Welcome section
+
+- Recent activity
+
+- Current projects
+
+- Project status
+
+- Empty states for new users
+
+
+
+Projects page:
+
+
+
+- List of user projects
+
+- Status badges
+
+- Open project button
+
+
+
+Messages page:
+
+
+
+- Simple client/studio conversation UI
+
+- Placeholder data if backend isn't fully implemented
+
+
+
+Profile page:
+
+
+
+- Change avatar
+
+- Name
+
+- Email
+
+- Password
+
+
+
+========================
+
+ADMIN PREPARATION
+
+========================
+
+
+
+Prepare the project architecture for a future admin panel.
+
+
+
+Do NOT implement the admin panel yet.
+
+
+
+Just organize the code so adding it later is easy.
+
+
+
+========================
+
+CODE QUALITY
+
+========================
+
+
+
+- Keep everything component-based.
+
+- Maintain a clean folder structure.
+
+- Follow modern Next.js best practices.
+
+- Do not duplicate code.
+
+- Keep everything responsive.
+
+- Preserve all existing functionality.
+
+
+
+IMPORTANT:
+
+
+
+Do NOT redesign the website from scratch.
+
+
+
+Improve and extend the current project while preserving its identity and style.
+
+
+
+The final result should feel like a premium digital agency website with a professional client portal.
+
+
+
+========================
+
+PROJECT ARCHITECTURE
+
+========================
+
+
+
+Prepare the project for future growth.
+
+
+
+Create a scalable architecture suitable for a real digital studio.
+
+
+
+========================
+
+USER ROLES
+
+========================
+
+
+
+Implement user roles in the database.
+
+
+
+Role enum:
+
+
+
+- CLIENT
+
+- ADMIN
+
+
+
+Every user must have a role.
+
+
+
+Default role: CLIENT.
+
+
+
+Do not implement the admin panel yet, but prepare the architecture for it.
+
+
+
+========================
+
+FOLDER STRUCTURE
+
+========================
+
+
+
+Use a clean scalable structure.
+
+
+
+Example:
+
+
+
+app/
+
+components/
+
+components/ui/
+
+components/layout/
+
+components/dashboard/
+
+components/projects/
+
+components/auth/
+
+lib/
+
+lib/auth/
+
+lib/db/
+
+lib/utils/
+
+hooks/
+
+types/
+
+prisma/
+
+public/
+
+
+
+========================
+
+DASHBOARD STRUCTURE
+
+========================
+
+
+
+Prepare pages for:
+
+
+
+Dashboard
+
+
+
+Projects
+
+
+
+Messages
+
+
+
+Profile
+
+
+
+Settings
+
+
+
+The dashboard should be easy to expand later.
+
+
+
+========================
+
+PROJECT STATUS SYSTEM
+
+========================
+
+
+
+Each project should support statuses.
+
+
+
+Enum:
+
+
+
+NEW
+
+DISCUSSION
+
+DESIGN
+
+DEVELOPMENT
+
+TESTING
+
+COMPLETED
+
+ARCHIVED
+
+
+
+Display status badges with proper colors.
+
+
+
+========================
+
+MESSAGING
+
+========================
+
+
+
+Prepare a conversation system.
+
+
+
+Each project can have messages.
+
+
+
+Messages should contain:
+
+
+
+- sender
+
+- timestamp
+
+- content
+
+
+
+Backend can be simple for now.
+
+
+
+========================
+
+FILE STORAGE PREPARATION
+
+========================
+
+
+
+Prepare architecture for future file uploads.
+
+
+
+Each project should be ready to store:
+
+
+
+- design files
+
+- source code
+
+- documents
+
+
+
+No upload implementation required yet.
+
+
+
+========================
+
+NOTIFICATION SYSTEM
+
+========================
+
+
+
+Prepare reusable notification architecture.
+
+
+
+Examples:
+
+
+
+Project updated
+
+
+
+New message
+
+
+
+Project completed
+
+
+
+Backend implementation is optional.
+
+
+
+========================
+
+SETTINGS
+
+========================
+
+
+
+Profile settings:
+
+
+
+- avatar
+
+- name
+
+- email
+
+- password
+
+
+
+Future settings placeholders:
+
+
+
+- notifications
+
+- language
+
+- theme
+
+
+
+========================
+
+QUALITY
+
+========================
+
+
+
+The project should feel like a real SaaS application.
+
+
+
+Keep everything modular, maintainable and easy to extend.
+
+
+
+Avoid technical debt.
+
+
+
+Write clean, reusable and modern code.

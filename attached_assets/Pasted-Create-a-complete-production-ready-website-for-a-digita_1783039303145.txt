@@ -1,0 +1,83 @@
+Create a complete, production-ready website for a digital studio called "SatUru Studio".
+
+The project must be fully working in Replit with no missing parts or unfinished features.
+
+DO NOT create a prototype. This must be a complete website.
+
+TECH STACK:
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Framer Motion (only subtle animations)
+- next-themes (for dark/light mode)
+- simple i18n system (no heavy libraries)
+
+STYLE:
+- Minimal dark modern SaaS design
+- Typography-driven layout
+- No card-based UI
+- Purple (#8B5CF6) + blue (#3B82F6) accents
+- Clean spacing, premium feel
+- Space / Saturn inspired theme (very subtle)
+
+DO NOT:
+- use external images or AI-generated images
+- create fake testimonials, fake stats, fake clients
+- overcomplicate UI
+- add unnecessary libraries
+
+MUST INCLUDE FULL FEATURES:
+
+1. DARK / LIGHT THEME
+- Toggle button in header
+- Default: dark mode
+- Smooth transitions
+- Implement properly using next-themes
+
+2. LANGUAGE SWITCHER
+- RU / EN support
+- Default language: Russian
+- Simple object-based translations (no heavy i18n libraries)
+- Translate all UI text
+
+3. WEBSITE SECTIONS:
+
+HERO:
+- SatUru Studio title
+- Subtitle about creating modern websites and digital experiences
+- CTA buttons: Start Project / View Work
+- Subtle animated background (CSS only, no images)
+
+ABOUT:
+- Short description of studio
+
+SERVICES:
+- Websites
+- UI/UX Design
+- Branding
+- Landing Pages
+- Game/Minecraft projects
+
+WORKS:
+- 3 example projects (structured, no images)
+
+PROCESS:
+- Idea → Design → Development → Testing → Launch
+
+CONTACT:
+- Telegram placeholder
+- Email placeholder
+- CTA button "Start Project"
+
+FOOTER:
+- SatUru Studio © 2026
+
+CODE REQUIREMENTS:
+- Clean project structure
+- Components split properly (/components)
+- Fully responsive design (mobile + desktop)
+- No unfinished TODOs
+- Must run immediately in Replit without errors
+
+IMPORTANT:
+The website should look like a real modern studio landing page, not a template or demo.
