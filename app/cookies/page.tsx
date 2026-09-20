@@ -1,0 +1,1 @@
+export default function Cookies(){return <main className="container max-w-3xl py-28"><div className="eyebrow">Legal</div><h1 className="mt-5 text-5xl">Cookie Policy</h1><p className="mt-8 leading-relaxed text-[var(--muted)]">Сайт может использовать технические cookie для корректной работы интерфейса и сохранения настроек темы.</p></main>}

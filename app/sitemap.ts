@@ -1,0 +1,1 @@
+import type {MetadataRoute} from 'next';export default function sitemap():MetadataRoute.Sitemap{const base='https://saturu.studio';return['','/services','/work','/about','/contact','/privacy','/terms','/cookies'].map(path=>({url:base+path,lastModified:new Date()}))}

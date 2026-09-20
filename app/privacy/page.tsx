@@ -1,0 +1,1 @@
+export default function Privacy(){return <main className="container max-w-3xl py-28"><div className="eyebrow">Legal</div><h1 className="mt-5 text-5xl">Privacy Policy</h1><p className="mt-8 leading-relaxed text-[var(--muted)]">Мы используем только данные, которые вы добровольно указываете при обращении. Они нужны для ответа на запрос и не продаются третьим сторонам.</p></main>}

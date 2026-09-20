@@ -1,0 +1,1 @@
+export default function Terms(){return <main className="container max-w-3xl py-28"><div className="eyebrow">Legal</div><h1 className="mt-5 text-5xl">Terms of Service</h1><p className="mt-8 leading-relaxed text-[var(--muted)]">Условия работы, объём, сроки и стоимость согласуются индивидуально до начала проекта.</p></main>}
