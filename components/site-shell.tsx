@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Menu, X, Sun, Moon, ArrowUpRight } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Lang, copy } from '@/data/content';
@@ -11,6 +11,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [currency, setCurrency] = useState('RUB');
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const t = copy[lang];
   const close = () => setOpen(false);
 
@@ -30,14 +32,14 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <div className="hidden items-center gap-4 text-[11px] md:flex">
           <button onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')} className="tracking-wider" aria-label="Switch language">{lang.toUpperCase()} <span className="text-[var(--muted)]">/ {lang === 'ru' ? 'EN' : 'RU'}</span></button>
           <button onClick={() => setCurrency(currency === 'RUB' ? 'USD' : 'RUB')} className="text-[var(--muted)]" aria-label="Switch currency">{currency}</button>
-          <button aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="border-l rule pl-4 text-[var(--muted)]">{theme === 'dark' ? <Sun /> : <Moon />}</button>
+          <button aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="border-l rule pl-4 text-[var(--muted)]">{mounted ? (theme === 'dark' ? <Sun /> : <Moon />) : <span aria-hidden="true" className="inline-block size-6" />}</button>
           <Link className="ml-2 inline-flex items-center gap-2 border border-[var(--fg)] px-4 py-2 transition-colors hover:bg-[var(--fg)] hover:text-[var(--bg)]" href="/contact">{t.start} <ArrowUpRight /></Link>
         </div>
         <button className="md:hidden" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X /> : <Menu />}</button>
       </div>
       {open && <div className="border-t rule md:hidden"><nav className="container flex flex-col gap-5 py-6 text-lg" aria-label="Mobile navigation">
         <Link href="/work" onClick={close}>{lang === 'ru' ? 'Работы' : 'Work'}</Link><Link href="/services" onClick={close}>{lang === 'ru' ? 'Услуги' : 'Services'}</Link><Link href="/about" onClick={close}>{lang === 'ru' ? 'О студии' : 'About'}</Link><Link href="/contact" onClick={close}>{lang === 'ru' ? 'Контакт' : 'Contact'}</Link>
-        <div className="flex items-center gap-5 border-t rule pt-5 text-xs text-[var(--muted)]"><button onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}>{lang.toUpperCase()} / {lang === 'ru' ? 'EN' : 'RU'}</button><button onClick={() => setCurrency(currency === 'RUB' ? 'USD' : 'RUB')}>{currency}</button><button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? 'Light theme' : 'Dark theme'}</button></div>
+        <div className="flex items-center gap-5 border-t rule pt-5 text-xs text-[var(--muted)]"><button onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}>{lang.toUpperCase()} / {lang === 'ru' ? 'EN' : 'RU'}</button><button onClick={() => setCurrency(currency === 'RUB' ? 'USD' : 'RUB')}>{currency}</button><button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{mounted ? (theme === 'dark' ? 'Light theme' : 'Dark theme') : 'Theme'}</button></div>
         <Link className="inline-flex w-fit items-center gap-2 border border-[var(--fg)] px-4 py-3 text-sm" href="/contact" onClick={close}>{t.start} <ArrowUpRight /></Link>
       </nav></div>}
     </header>
