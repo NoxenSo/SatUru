@@ -186,4 +186,56 @@ main > section:nth-child(6):not(.stage4), main > section:nth-child(7):not(.stage
   header .container > button { border: 1px solid var(--accent); padding: .55rem; color: var(--fg); }
   .hero-visual { display: none !important; }
 }
+/* Deep visual system: orbit, grid, scale and editorial depth */
+.hero-visual { position: relative; min-height: 27rem; }
+.hero-visual::before { content: 'SATURU / 01'; position: absolute; right: 0; top: -1.5rem; color: var(--accent); font-size: 10px; letter-spacing: .2em; }
+.hero-visual::after { content: ''; position: absolute; inset: 1.5rem 0 0 1.5rem; background-image: linear-gradient(color-mix(in srgb, var(--line) 55%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--line) 55%, transparent) 1px, transparent 1px); background-size: 32px 32px; mask-image: linear-gradient(135deg, black, transparent 75%); opacity: .45; pointer-events: none; }
+.hero-orbit { z-index: 1; margin-top: 3rem; border-left: 1px solid var(--accent); border-bottom: 1px solid var(--line); box-shadow: 22px 22px 0 color-mix(in srgb, var(--accent-soft) 28%, transparent); }
+.hero-orbit::before { width: 120%; height: 45%; left: -10%; border-color: var(--accent); transform: rotate(-32deg); opacity: .9; }
+.hero-orbit::after { width: 10px; height: 10px; left: 57%; top: 39%; box-shadow: 0 0 0 7px var(--accent-soft), 24px 24px 0 -3px var(--accent-violet); }
+.hero-orbit span:last-child { color: var(--accent); }
+main > section:first-child { position: relative; overflow: hidden; background: radial-gradient(circle at 84% 45%, color-mix(in srgb, var(--accent-soft) 25%, transparent), transparent 25%), var(--bg); }
+main > section:first-child::after { content: '01'; position: absolute; right: 3vw; bottom: 2rem; color: color-mix(in srgb, var(--muted) 32%, transparent); font-family: 'Syne', sans-serif; font-size: clamp(5rem, 14vw, 12rem); line-height: .7; pointer-events: none; }
+main > section:nth-child(2), main > section:nth-child(3), main > section:nth-child(4), main > section:nth-child(6) { position: relative; overflow: hidden; }
+main > section:nth-child(2)::before, main > section:nth-child(3)::before, main > section:nth-child(4)::before, main > section:nth-child(6)::before { content: ''; position: absolute; top: 0; right: 7%; width: 1px; height: 100%; background: color-mix(in srgb, var(--line) 55%, transparent); pointer-events: none; }
+main > section:nth-child(2)::after, main > section:nth-child(3)::after, main > section:nth-child(4)::after { content: ''; position: absolute; top: 4rem; right: 4%; width: 7rem; height: 7rem; border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent); border-radius: 50%; transform: rotate(-24deg) skewX(-18deg); opacity: .45; pointer-events: none; }
+main > section:nth-child(3) { background: linear-gradient(112deg, transparent 0 58%, color-mix(in srgb, var(--accent-soft) 18%, transparent) 100%); }
+main > section:nth-child(3) > div:first-child { position: sticky; top: 7rem; align-self: start; padding-top: 1rem; }
+main > section:nth-child(3) > div:first-child h2 { max-width: 18rem; font-size: clamp(2.8rem, 5vw, 5.2rem); line-height: .9; }
+main > section:nth-child(3) > div:last-child > a { position: relative; min-height: 8.5rem; }
+main > section:nth-child(3) > div:last-child > a::before { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent-violet)); transition: width .35s ease; }
+main > section:nth-child(3) > div:last-child > a:hover::before { width: 100%; }
+main > section:nth-child(3) > div:last-child > a > span:first-child { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 600; transition: color .25s ease, transform .25s ease; }
+main > section:nth-child(3) > div:last-child > a:hover > span:first-child { color: var(--accent-violet); transform: translateX(5px); }
+main > section:nth-child(3) > div:last-child > a > span:nth-child(2) { font-family: 'Syne', sans-serif; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 600; }
+main > section:nth-child(4) { background: linear-gradient(145deg, color-mix(in srgb, var(--panel) 40%, transparent), transparent 55%); }
+main > section:nth-child(4) .container > div:first-child { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: end; }
+main > section:nth-child(4) .container > div:first-child h2 { font-size: clamp(3rem, 7vw, 7rem); line-height: .82; }
+main > section:nth-child(4) .container > div:last-child { position: relative; z-index: 1; gap: 2.5rem; }
+main > section:nth-child(4) .work-preview { box-shadow: 18px 18px 0 color-mix(in srgb, var(--accent-soft) 22%, transparent); }
+main > section:nth-child(4) .container > div:last-child > a:first-child .work-preview { min-height: 38rem; }
+main > section:nth-child(4) .container > div:last-child > a:not(:first-child) .work-preview { min-height: 18rem; }
+main > section:nth-child(4) .container > div:last-child > a:first-child { transform: translateY(1rem); }
+main > section:nth-child(4) .container > div:last-child > a:first-child:hover { transform: translateY(.5rem); }
+main > section:nth-child(4) .container > div:last-child > a > div:last-child { display: grid; grid-template-columns: 4rem 1fr auto; gap: 1rem; align-items: start; }
+main > section:nth-child(4) .container > div:last-child > a > div:last-child > div:first-child { font-family: 'Syne', sans-serif; font-size: 1.25rem; }
+main > section:nth-child(4) .container > div:last-child > a > div:last-child > div:nth-child(2) { color: var(--muted); }
+main > section:nth-child(4) .container > div:last-child > a > div:last-child > div:last-child { color: var(--accent); }
+.work-preview::before { content: ''; position: absolute; inset: 1rem; border: 1px solid color-mix(in srgb, var(--fg) 28%, transparent); z-index: 1; pointer-events: none; transition: inset .35s ease, border-color .35s ease; }
+.work-preview:hover::before { inset: 1.5rem; border-color: color-mix(in srgb, var(--fg) 55%, transparent); }
+.stage4, .about-team { position: relative; overflow: hidden; }
+.stage4::before, .about-team::before { content: '02—09'; position: absolute; right: 4%; top: 2rem; color: color-mix(in srgb, var(--muted) 45%, transparent); font-size: 10px; letter-spacing: .18em; }
+.eyebrow { position: relative; z-index: 2; }
+.pricing-row h3, .about-person h3, .stage4-heading h2 { font-family: 'Syne', sans-serif; }
+@media (max-width: 767px) {
+  main > section:first-child::after { right: -1rem; bottom: 1rem; font-size: 7rem; }
+  main > section:nth-child(2)::before, main > section:nth-child(3)::before, main > section:nth-child(4)::before, main > section:nth-child(6)::before { right: 1rem; }
+  main > section:nth-child(3) > div:first-child { position: static; }
+  main > section:nth-child(4) .container > div:first-child { display: block; }
+  main > section:nth-child(4) .container > div:first-child h2 { max-width: 18rem; }
+  main > section:nth-child(4) .container > div:last-child > a:first-child .work-preview { min-height: 25rem; }
+  main > section:nth-child(4) .container > div:last-child > a > div:last-child { grid-template-columns: 2.5rem 1fr; }
+  main > section:nth-child(4) .container > div:last-child > a > div:last-child > div:last-child { grid-column: 2; }
+  .work-preview::before { inset: .75rem; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
