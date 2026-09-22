@@ -7,7 +7,7 @@ export const services = [
  {slug:'game-minecraft',num:'05',title:{ru:'Game / Minecraft',en:'Game / Minecraft'},desc:{ru:'Интерфейсы и инфраструктура игровых проектов.',en:'Interfaces and infrastructure for game projects.'}},
 ];
 export const projects = [
- {slug:'aetheriaworld',label:'Minecraft / Digital Project',title:'AetheriaWorld',desc:{ru:'Цифровая платформа и визуальная система для Minecraft-проекта.',en:'Digital platform and visual system for a Minecraft project.'},status:'Project'},
+ {slug:'aetheriaworld',label:'Game / Digital / Development',title:'AetheriaWorld',desc:{ru:'Цифровая платформа и визуальная система для Minecraft-проекта.',en:'Digital platform and visual system for a Minecraft project.'},status:'Project'},
  {slug:'digital-product-concept',label:'Digital Product',title:'Product concept',desc:{ru:'Концепт цифрового продукта с ясной структурой и интерфейсом.',en:'A digital product concept with a clear structure and interface.'},status:'Concept'},
  {slug:'business-website-concept',label:'Web Development',title:'Business website',desc:{ru:'Концепт сайта для команды, которой важно говорить по делу.',en:'A website concept for a team that values clarity.'},status:'Internal project'},
  {slug:'automation-project',label:'Automation',title:'Automation system',desc:{ru:'Концепт внутреннего инструмента для упрощения процессов.',en:'An internal tool concept for simpler processes.'},status:'Concept'},
