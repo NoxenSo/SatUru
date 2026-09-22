@@ -71,4 +71,40 @@ main > section:nth-child(4) .container > div:last-child > a > div:last-child > d
   main > section:nth-child(4) .container > div:last-child > a, main > section:nth-child(4) .container > div:last-child > a:first-child { width: 100%; }
   main > section:nth-child(4) .work-preview, main > section:nth-child(4) .container > div:last-child > a:not(:first-child) .work-preview { min-height: 16rem; }
 }
+/* Stage 3: process, about and team */
+main > section:nth-child(6) { padding-top: 8rem; padding-bottom: 8rem; }
+main > section:nth-child(6) .container { display: grid; grid-template-columns: .7fr 1.3fr; gap: 3rem; }
+main > section:nth-child(6) .container > div:last-child { border-top: 1px solid var(--line); }
+main > section:nth-child(6) .container > div:last-child > div { display: grid; grid-template-columns: 4.5rem 1fr minmax(14rem,.7fr); gap: 1.5rem; align-items: start; padding: 1.5rem 0; border-bottom: 1px solid var(--line); transition: padding .3s ease, background-color .3s ease; }
+main > section:nth-child(6) .container > div:last-child > div:hover { padding-inline: 1rem; background: color-mix(in srgb, var(--accent-soft) 35%, transparent); }
+main > section:nth-child(6) .container > div:last-child > div > span { color: var(--accent); font-size: 11px; letter-spacing: .14em; }
+main > section:nth-child(6) h3 { margin: 0; font-size: clamp(1.2rem,2vw,1.6rem); font-weight: 400; }
+main > section:nth-child(6) p { margin: .45rem 0 0; color: var(--muted); font-size: .875rem; line-height: 1.5; }
+.about-team { padding: 8rem 0; background: color-mix(in srgb, var(--panel) 22%, transparent); }
+.about-team__grid { display: grid; grid-template-columns: .8fr 1fr; gap: 5rem 3rem; }
+.about-team h2 { max-width: 35rem; margin: 1.25rem 0 1.5rem; font-size: clamp(2.5rem,5vw,5rem); font-weight: 400; line-height: .94; }
+.about-team__grid > div:first-child p { max-width: 31rem; color: var(--muted); font-size: 1.1rem; line-height: 1.7; }
+.about-team__facts { display: grid; grid-template-columns: repeat(3,1fr); align-self: end; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.about-team__facts div { display: flex; flex-direction: column; gap: .6rem; padding: 1rem 0; }
+.about-team__facts div + div { padding-left: 1rem; border-left: 1px solid var(--line); }
+.about-team__facts span, .about-person > span { color: var(--accent); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+.about-team__facts strong { font-size: .85rem; font-weight: 400; }
+.about-team__people { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
+.about-person { display: grid; grid-template-columns: 3rem 1fr; gap: 1rem; padding: 1.5rem 0; }
+.about-person + .about-person { padding-left: 2rem; border-left: 1px solid var(--line); }
+.about-person h3 { margin: 0; font-size: clamp(2rem,4vw,4rem); font-weight: 400; }
+.about-person p { margin: .35rem 0 1.1rem; color: var(--fg); font-size: .85rem; }
+.about-person small { color: var(--muted); font-size: .8rem; line-height: 1.5; }
+@media (max-width: 767px) {
+  main > section:nth-child(6) { padding-top: 5rem; padding-bottom: 5rem; }
+  main > section:nth-child(6) .container { display: flex; flex-direction: column; gap: 2.5rem; }
+  main > section:nth-child(6) .container > div:last-child > div { grid-template-columns: 2.5rem 1fr; gap: .75rem; }
+  main > section:nth-child(6) .container > div:last-child > div p { grid-column: 2; }
+  .about-team { padding: 5rem 0; }
+  .about-team__grid { display: flex; flex-direction: column; gap: 3rem; }
+  .about-team__facts { grid-template-columns: 1fr; }
+  .about-team__facts div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+  .about-team__people { display: flex; flex-direction: column; }
+  .about-person + .about-person { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
