@@ -107,4 +107,51 @@ main > section:nth-child(6) p { margin: .45rem 0 0; color: var(--muted); font-si
   .about-team__people { display: flex; flex-direction: column; }
   .about-person + .about-person { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
 }
+/* Stage 4: pricing, FAQ and contact */
+/* Replace the earlier placeholder versions with the finished Stage 4 blocks. */
+main > section:nth-child(6):not(.stage4), main > section:nth-child(7):not(.stage4), main > section:nth-child(8):not(.stage4) { display: none; }
+.stage4 { padding: 8rem 0; border-top: 1px solid var(--line); }
+.stage4 .container { display: grid; grid-template-columns: .7fr 1.3fr; gap: 3rem; }
+.stage4-heading h2 { margin: 1.25rem 0 0; font-size: clamp(2.75rem, 5vw, 5rem); font-weight: 400; line-height: .94; }
+.pricing-list { border-top: 1px solid var(--line); }
+.pricing-row { display: grid; grid-template-columns: 4.5rem 1fr minmax(13rem,.8fr) auto; gap: 1.5rem; align-items: start; padding: 1.6rem 0; border-bottom: 1px solid var(--line); transition: padding .3s ease, background-color .3s ease; }
+.pricing-row:hover { padding-inline: 1rem; background: color-mix(in srgb, var(--accent-soft) 35%, transparent); }
+.pricing-index { color: var(--accent); font-size: 11px; letter-spacing: .14em; }
+.pricing-row h3 { margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 400; letter-spacing: -.04em; }
+.pricing-row p, .pricing-includes { margin: .4rem 0 0; color: var(--muted); font-size: .85rem; line-height: 1.5; }
+.pricing-includes { max-width: 15rem; }
+.pricing-row .link-arrow { font-size: .8rem; white-space: nowrap; }
+.faq-section { background: color-mix(in srgb, var(--panel) 20%, transparent); }
+.faq-list { border-top: 1px solid var(--line); }
+.faq-list details { border-bottom: 1px solid var(--line); }
+.faq-list summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.35rem 0; cursor: pointer; list-style: none; font-size: 1.05rem; }
+.faq-list summary::-webkit-details-marker { display: none; }
+.faq-list summary span { color: var(--accent); font-size: 1.5rem; font-weight: 300; transition: transform .25s ease; }
+.faq-list details[open] summary span { transform: rotate(45deg); }
+.faq-list details p { max-width: 38rem; margin: 0 2rem 1.4rem 0; color: var(--muted); font-size: .9rem; line-height: 1.6; }
+.contact-section .stage4-heading p { max-width: 22rem; margin: 1.5rem 0; color: var(--muted); line-height: 1.6; }
+.contact-email { display: inline-block; border-bottom: 1px solid var(--line); padding-bottom: .35rem; font-size: .95rem; transition: border-color .25s ease; }
+.contact-email:hover { border-color: var(--accent); }
+.contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 1rem; border-top: 1px solid var(--line); }
+.contact-form label { display: flex; flex-direction: column; gap: .55rem; padding-top: 1rem; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+.contact-form input:not([type=checkbox]), .contact-form select, .contact-form textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; outline: 0; padding: .5rem 0 .75rem; background: transparent; color: var(--fg); font: inherit; font-size: .95rem; letter-spacing: normal; text-transform: none; resize: vertical; transition: border-color .2s ease; }
+.contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--accent); }
+.contact-form select { appearance: none; }
+.contact-form__wide { grid-column: 1 / -1; }
+.contact-form__check { flex-direction: row !important; align-items: center; gap: .6rem !important; text-transform: none !important; letter-spacing: normal !important; }
+.contact-form__check input { accent-color: var(--accent); }
+.form-submit { width: max-content; border: 0; border-bottom: 1px solid var(--line); padding: .7rem 0; background: transparent; color: var(--fg); cursor: pointer; font-size: .9rem; transition: border-color .25s ease, padding .25s ease; }
+.form-submit:hover { border-color: var(--accent); padding-inline: .5rem; }
+.form-submit span { color: var(--accent); margin-left: .7rem; }
+.form-status { border-top: 1px solid var(--line); padding-top: 1.25rem; color: var(--muted); line-height: 1.6; }
+@media (max-width: 767px) {
+  .stage4 { padding: 5rem 0; }
+  .stage4 .container { display: flex; flex-direction: column; gap: 2.5rem; }
+  .pricing-row { grid-template-columns: 2.5rem 1fr 1.25rem; gap: .75rem; }
+  .pricing-includes { grid-column: 2 / 3; max-width: none; }
+  .pricing-row .link-arrow { grid-column: 2 / 3; width: max-content; }
+  .faq-list summary { font-size: .95rem; }
+  .contact-form { grid-template-columns: 1fr; }
+  .contact-form__wide { grid-column: auto; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
