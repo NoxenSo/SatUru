@@ -239,3 +239,68 @@ main > section:nth-child(4) .container > div:last-child > a > div:last-child > d
   .work-preview::before { inset: .75rem; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* SatUru visual system */
+:root {
+  --bg: #eef0f4;
+  --fg: #253047;
+  --muted: #707b91;
+  --line: #d4d9e3;
+  --panel: #e5e9f0;
+  --accent: #5d8ee8;
+  --accent-violet: #4b466f;
+  --accent-soft: #dce6fa;
+  --warm: #f4f5f7;
+  --detail-red: #b66d76;
+  --detail-yellow: #b89b5d;
+}
+.dark {
+  --bg: #110d20;
+  --fg: #f1eef5;
+  --muted: #aaa5bb;
+  --line: #332d48;
+  --panel: #18132a;
+  --accent: #729ff2;
+  --accent-violet: #8673b8;
+  --accent-soft: #282044;
+  --warm: #f1eef5;
+  --detail-red: #bd707d;
+  --detail-yellow: #c3a05b;
+}
+body { background: var(--bg); color: var(--fg); }
+::selection { background: var(--accent); color: #110d20; }
+.eyebrow { color: var(--accent); font-weight: 700; letter-spacing: .2em; }
+.eyebrow::before { background: var(--accent); }
+.rule, .stage4, .pricing-list, .faq-list, .contact-form { border-color: var(--line); }
+main > section:nth-child(2), main > section:nth-child(3), main > section:nth-child(4), .stage4, .about-team { background: color-mix(in srgb, var(--panel) 28%, transparent); }
+main > section:nth-child(3), main > section:nth-child(4), main > section:nth-child(6) { border-top-color: var(--line); }
+main > section:nth-child(3) > div:last-child > a:hover, .pricing-row:hover, main > section:nth-child(6) .container > div:last-child > div:hover { background: color-mix(in srgb, var(--accent-soft) 58%, transparent); }
+main > section:nth-child(3) > div:last-child > a > span:first-child, .pricing-index, .about-team__facts span, .about-person > span { color: var(--accent); }
+main > section:nth-child(3) > div:last-child > a > span:nth-child(3), .pricing-row p, .pricing-includes, .faq-list details p, .contact-section .stage4-heading p, .about-team__grid > div:first-child p, .about-person small { color: var(--muted); }
+.work-preview { border-color: var(--line); box-shadow: 16px 16px 0 color-mix(in srgb, var(--accent-soft) 50%, transparent); }
+.dark .work-preview { background-color: #1a1730; }
+.dark .work-preview--aetheria { background: radial-gradient(ellipse at 68% 24%, #b8cbff 0 1px, transparent 2px), linear-gradient(140deg,#17112b 0 50%,#273e75 50% 100%); }
+.dark .work-preview--product { background: linear-gradient(120deg,#171329 0 50%,#344f88 50%); }
+.dark .work-preview--business { background: linear-gradient(160deg,#1b1630 0 42%,#7f88b3 42% 43%,#262247 43%); }
+.dark .work-preview--automation { background: linear-gradient(135deg,#17142a 0 55%,#3e4f84 55%); }
+button, .link-arrow, .form-submit, header a { transition: color .2s ease, background-color .2s ease, border-color .2s ease, transform .2s ease, gap .2s ease; }
+.link-arrow { color: var(--fg); border-color: var(--line); }
+.link-arrow:hover { color: var(--accent); border-color: var(--accent); }
+.form-submit { min-height: 44px; border: 1px solid var(--accent); border-radius: 3px; padding: .75rem 1.2rem; background: var(--accent); color: #10172a; font-weight: 700; }
+.form-submit:hover { border-color: var(--accent-violet); background: var(--accent-violet); color: var(--warm); transform: translateY(-2px); }
+.form-submit:active { transform: translateY(0); }
+header .container > div:last-of-type > button:last-of-type, header .container > nav + div > a, header .container > button + div a { border: 1px solid var(--accent); border-radius: 3px; background: var(--accent); color: #10172a; }
+header .container > div:last-of-type > button:last-of-type:hover, header .container > nav + div > a:hover, header .container > button + div a:hover { border-color: var(--accent-violet); background: var(--accent-violet); color: var(--warm); }
+header .container > div:last-of-type > button:last-of-type { border-left: 1px solid var(--line); background: transparent; color: var(--muted); }
+.contact-form input:not([type=checkbox]), .contact-form select, .contact-form textarea { color: var(--fg); border-color: var(--line); }
+.contact-form input:not([type=checkbox]):hover, .contact-form select:hover, .contact-form textarea:hover { border-color: color-mix(in srgb, var(--accent) 65%, var(--line)); }
+.contact-form input:not([type=checkbox]):focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--accent); box-shadow: 0 1px 0 var(--accent); }
+.faq-list summary:hover, .contact-email:hover { color: var(--accent); }
+.faq-list summary span { color: var(--accent); }
+.faq-list details[open] summary { color: var(--accent); }
+.hero-orbit { border-color: var(--line); box-shadow: 22px 22px 0 color-mix(in srgb, var(--accent-soft) 55%, transparent); }
+.hero-orbit::before { border-color: var(--accent-violet); }
+.hero-orbit::after { background: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
+.hero-visual::after { opacity: .3; }
+@media (max-width: 767px) { .form-submit { width: 100%; } }
+
