@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import {FormEvent, useState} from 'react';
 
 export function ContactForm() {
@@ -21,7 +22,7 @@ export function ContactForm() {
     <label>Budget<input name="budget" placeholder="From / custom" /></label>
     <label>Deadline<input name="deadline" placeholder="When would you like to launch?" /></label>
     <label className="contact-form__wide">Project description<textarea name="description" required rows={5} placeholder="A few words about the task" /></label>
-    <label className="contact-form__check contact-form__wide"><input type="checkbox" required /> <span>I agree with the Privacy Policy.</span></label>
+    <label className="contact-form__check contact-form__wide"><input type="checkbox" required /> <span>I agree with the <Link href="/privacy" className="underline underline-offset-4">Privacy Policy</Link>.</span></label>
     <button className="form-submit contact-form__wide" type="submit">Send request <span aria-hidden="true">↗</span></button>
   </form>;
 }

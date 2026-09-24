@@ -1,1 +1,19 @@
-'use client';import {useState} from 'react';export default function Contact(){const [sent,setSent]=useState(false);return <main className="container py-28"><div className="grid gap-16 lg:grid-cols-[.8fr_1.2fr]"><div><div className="eyebrow">SatUru Studio / Contact</div><h1 className="mt-5 text-5xl sm:text-7xl">Расскажите о проекте.</h1><p className="mt-8 text-lg leading-relaxed text-[var(--muted)]">Опишите задачу в свободной форме. Мы вернёмся с вопросами и следующим шагом.</p><a className="mt-10 inline-block underline underline-offset-4" href="mailto:hello@saturu.studio">hello@saturu.studio</a></div><form onSubmit={e=>{e.preventDefault();setSent(true)}} className="flex flex-col gap-5 border-t border-[var(--line)] pt-6"><label>Имя<input required name="name" className="mt-2 w-full border-b border-[var(--line)] bg-transparent py-3 outline-none focus:border-[var(--accent)]"/></label><label>Email<input required type="email" name="email" className="mt-2 w-full border-b border-[var(--line)] bg-transparent py-3 outline-none focus:border-[var(--accent)]"/></label><label>Telegram<input name="telegram" className="mt-2 w-full border-b border-[var(--line)] bg-transparent py-3 outline-none focus:border-[var(--accent)]"/></label><label>Тип проекта<select name="type" className="mt-2 w-full border-b border-[var(--line)] bg-transparent py-3 outline-none"><option>Web Development</option><option>UI/UX Design</option><option>Automation</option><option>Game / Minecraft</option></select></label><label>Расскажите о задаче<textarea required name="description" rows={5} className="mt-2 w-full resize-y border-b border-[var(--line)] bg-transparent py-3 outline-none focus:border-[var(--accent)]"/></label><label className="flex items-start gap-3 text-sm text-[var(--muted)]"><input required type="checkbox" className="mt-1"/>Я согласен с политикой конфиденциальности.</label><button className="mt-3 w-fit rounded-full bg-[var(--fg)] px-6 py-3 font-semibold text-[var(--bg)]" type="submit">{sent?'Demo form — backend connection required':'Отправить запрос'}</button></form></div></main>}
+'use client';
+
+import Link from 'next/link';
+import { ContactForm } from '@/components/contact-form';
+
+export default function Contact() {
+  return <main className="container py-28" id="contact">
+    <div className="grid gap-16 lg:grid-cols-[.8fr_1.2fr]">
+      <div>
+        <div className="eyebrow">SatUru Studio / Contact</div>
+        <h1 className="mt-5 text-5xl sm:text-7xl">Расскажите о проекте.</h1>
+        <p className="mt-8 max-w-md text-lg leading-relaxed text-[var(--muted)]">Опишите задачу в свободной форме. Мы вернёмся с вопросами и следующим шагом.</p>
+        <a className="mt-10 inline-block underline underline-offset-4" href="mailto:hello@saturu.studio">hello@saturu.studio</a>
+        <Link className="mt-5 block text-sm text-[var(--muted)] underline underline-offset-4" href="/privacy">Privacy Policy</Link>
+      </div>
+      <ContactForm />
+    </div>
+  </main>;
+}
