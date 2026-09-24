@@ -332,3 +332,58 @@ header .container > div:last-of-type > button:last-of-type { border-left: 1px so
 .hero-visual::after { opacity: .3; }
 @media (max-width: 767px) { .form-submit { width: 100%; } }
 
+/* Unified SatUru button system */
+:where(.link-arrow, .form-submit, header a[href='/contact']) {
+  border-radius: 3px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  letter-spacing: .01em;
+  text-decoration: none;
+}
+:where(.link-arrow, .form-submit, header a[href='/contact']):focus-visible,
+.faq-list summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.link-arrow {
+  min-height: 46px;
+  padding: .78rem 1.1rem;
+}
+.link-arrow svg, .form-submit span { flex: 0 0 auto; transition: transform .2s ease; }
+.link-arrow:hover svg, .form-submit:hover span { transform: translate(2px, -2px); }
+.link-arrow.text-\[var\(--muted\)\] {
+  min-height: 42px;
+  border-color: var(--line);
+  padding-inline: .9rem;
+  font-weight: 600;
+}
+.link-arrow.text-\[var\(--muted\)\]:hover { background: color-mix(in srgb, var(--accent-soft) 65%, transparent); color: var(--fg); }
+main > section:first-child .mt-10.flex { align-items: center; gap: .75rem; }
+main > section:first-child .link-arrow:first-child { min-width: 148px; }
+main > section:first-child .link-arrow + .link-arrow { min-width: 132px; }
+.pricing-row .link-arrow { min-width: 126px; justify-self: end; }
+main > section:nth-child(3) > div:last-child > a .link-arrow,
+main > section:nth-child(3) > div:last-child > a.link-arrow { min-height: auto; border: 0; padding: .35rem 0; background: transparent; color: var(--muted); font-size: .78rem; font-weight: 700; }
+main > section:nth-child(3) > div:last-child > a .link-arrow:hover,
+main > section:nth-child(3) > div:last-child > a.link-arrow:hover { background: transparent; color: var(--accent); transform: none; }
+main > section:nth-child(3) > div:last-child > a .link-arrow svg,
+main > section:nth-child(3) > div:last-child > a.link-arrow svg { width: 14px; height: 14px; }
+
+.pricing-row:nth-child(2) .link-arrow { border-color: var(--accent); background: var(--accent); color: #10172a; }
+.pricing-row:nth-child(2) .link-arrow:hover { border-color: var(--accent-violet); background: var(--accent-violet); color: var(--warm); }
+.pricing-row:nth-child(1) .link-arrow, .pricing-row:nth-child(3) .link-arrow { background: transparent; }
+.faq-list summary { min-height: 64px; padding: 1.1rem .25rem; border-radius: 2px; transition: color .2s ease, background-color .2s ease, padding .2s ease; }
+.faq-list summary:hover { padding-inline: .75rem; background: color-mix(in srgb, var(--accent-soft) 48%, transparent); }
+.faq-list summary span { display: inline-grid; place-items: center; width: 28px; height: 28px; border: 1px solid currentColor; border-radius: 50%; font-size: 1.1rem; line-height: 1; }
+.contact-form .form-submit { width: max-content; min-width: 148px; }
+header .container > div:last-of-type > button:last-of-type,
+header .container > nav + div > a,
+header .container > button + div a { min-height: 42px; padding: .7rem 1rem; }
+header .container > div:last-of-type > button:not(:last-of-type) { min-height: 42px; padding: .55rem .25rem; }
+@media (max-width: 767px) {
+  main > section:first-child .mt-10.flex { align-items: stretch; flex-direction: column; gap: .65rem; }
+  main > section:first-child .link-arrow:first-child, main > section:first-child .link-arrow + .link-arrow { width: max-content; min-width: 0; }
+  .pricing-row .link-arrow, .contact-form .form-submit { justify-self: start; width: max-content; }
+  .faq-list summary { min-height: 60px; }
+}
+
