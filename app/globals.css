@@ -6,19 +6,38 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: 'Manrope', sans-serif; font-size: 15px; -webkit-font-smoothing: antialiased; }
-h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -.065em; font-weight: 600; }
-h1 { text-wrap: balance; }
+h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -.065em; font-weight: 600; text-wrap: balance; }
+h1 { font-size: clamp(4rem, 10vw, 8.75rem); line-height: .86; }
+h2 { font-size: clamp(2.65rem, 5vw, 5rem); line-height: .94; }
+h3 { font-size: clamp(1.25rem, 2vw, 1.75rem); line-height: 1.08; }
+p { max-width: 42rem; }
+
 ::placeholder { color: color-mix(in srgb, var(--muted) 75%, transparent); }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; }
 .container { width: min(1200px, calc(100% - 64px)); margin-inline: auto; }
-.eyebrow { color: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.eyebrow { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .2em; line-height: 1.2; text-transform: uppercase; }
+.stage4-heading, .about-team__grid > div:first-child { text-align: left; }
+.stage4-heading h2, .about-team h2 { max-width: 14ch; }
+.stage4-heading p, .about-team__grid > div:first-child p { max-width: 38rem; }
+.hero-visual + *, .contact-form { min-width: 0; }
+
 .rule { border-color: var(--line); }
 .reveal { animation: rise .7s ease both; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 ::selection { background: var(--accent); color: var(--bg); }
-.link-arrow { display: inline-flex; align-items: center; gap: .55rem; border-bottom: 1px solid var(--line); padding-bottom: .4rem; color: var(--fg); font-weight: 600; transition: gap .25s, border-color .25s, color .25s; }
-.link-arrow:hover { gap: .9rem; border-color: var(--accent); color: var(--accent); }
+.link-arrow { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; gap: .65rem; border: 1px solid var(--line); padding: .7rem 1rem; color: var(--fg); font-size: .82rem; font-weight: 700; line-height: 1; transition: gap .2s ease, border-color .2s ease, color .2s ease, background-color .2s ease, transform .2s ease; }
+.link-arrow:hover { gap: .9rem; border-color: var(--accent); background: var(--accent); color: #10172a; transform: translateY(-2px); }
+.link-arrow:active { transform: translateY(0); }
+.link-arrow svg, .form-submit svg { width: 16px; height: 16px; }
+.link-arrow.text-\[var\(--muted\)\] { border-color: var(--line); background: transparent; color: var(--muted); }
+.link-arrow.text-\[var\(--muted\)\]:hover { color: #10172a; }
+main > section:first-child .link-arrow:first-child { border-color: var(--accent); background: var(--accent); color: #10172a; }
+main > section:first-child .link-arrow:first-child:hover { border-color: var(--accent-violet); background: var(--accent-violet); color: var(--warm); }
+main > section:first-child .link-arrow + .link-arrow { color: var(--muted); }
+main > section:first-child .link-arrow + .link-arrow:hover { color: #10172a; }
+main > section:first-child .mt-10.flex { gap: 1.25rem; }
+
 button, a, summary, input, select, textarea { outline: none; }
 button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 header .container > div:last-of-type > button { color: var(--muted); transition: color .2s ease; }
@@ -73,7 +92,12 @@ main > section:nth-child(3) > div:last-child { display: flex; flex-direction: co
 main > section:nth-child(3) > div:last-child > a { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) minmax(12rem, .7fr) 1.5rem; align-items: center; gap: 1.5rem; min-height: 6.75rem; border-bottom: 1px solid var(--line); transition: padding .3s ease, background-color .3s ease; }
 main > section:nth-child(3) > div:last-child > a:hover { padding-inline: 1rem; background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
 main > section:nth-child(3) > div:last-child > a > span:first-child { color: var(--accent); font-size: 11px; letter-spacing: .14em; }
-main > section:nth-child(3) > div:last-child > a > span:nth-child(2) { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.25rem, 2vw, 1.75rem); letter-spacing: -.04em; }
+main > section:nth-child(3) > div:last-child > a > span:nth-child(2) { font-family: 'Syne', sans-serif; font-size: clamp(1.25rem, 2vw, 1.75rem); font-weight: 600; letter-spacing: -.045em; }
+main > section:nth-child(3) > div:last-child > a > span:nth-child(3) { max-width: 28rem; }
+main > section:nth-child(4) .container > div:first-child h2 { max-width: 11ch; }
+main > section:nth-child(4) .container > div:first-child p { max-width: 34rem; }
+main > section:nth-child(4) .container > div:last-child > a > div:last-child h3 { max-width: 14ch; }
+
 main > section:nth-child(3) > div:last-child > a > span:nth-child(3) { color: var(--muted); font-size: .875rem; line-height: 1.5; }
 main > section:nth-child(3) > div:last-child > a > svg { color: var(--muted); transition: transform .3s ease, color .3s ease; }
 main > section:nth-child(3) > div:last-child > a:hover > svg { color: var(--fg); transform: translate(3px, -3px); }
@@ -286,7 +310,11 @@ main > section:nth-child(3) > div:last-child > a > span:nth-child(3), .pricing-r
 button, .link-arrow, .form-submit, header a { transition: color .2s ease, background-color .2s ease, border-color .2s ease, transform .2s ease, gap .2s ease; }
 .link-arrow { color: var(--fg); border-color: var(--line); }
 .link-arrow:hover { color: var(--accent); border-color: var(--accent); }
-.form-submit { min-height: 44px; border: 1px solid var(--accent); border-radius: 3px; padding: .75rem 1.2rem; background: var(--accent); color: #10172a; font-weight: 700; }
+.form-submit { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid var(--accent); border-radius: 3px; padding: .8rem 1.25rem; background: var(--accent); color: #10172a; font-size: .82rem; font-weight: 700; letter-spacing: .01em; }
+.form-submit:disabled { cursor: not-allowed; opacity: .55; transform: none; }
+.contact-form { row-gap: 1.5rem; }
+.contact-form label { line-height: 1.2; }
+
 .form-submit:hover { border-color: var(--accent-violet); background: var(--accent-violet); color: var(--warm); transform: translateY(-2px); }
 .form-submit:active { transform: translateY(0); }
 header .container > div:last-of-type > button:last-of-type, header .container > nav + div > a, header .container > button + div a { border: 1px solid var(--accent); border-radius: 3px; background: var(--accent); color: #10172a; }
