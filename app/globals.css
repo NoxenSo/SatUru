@@ -216,7 +216,8 @@ main > section:first-child .reveal > .mt-10 span { color: #848394; }
 header { position: sticky !important; top: 0; z-index: 50; }
 header > .container { position: relative; z-index: 51; }
 .utility-toggle { position: relative; z-index: 60; }
-header > .container > button { position: relative; z-index: 60; }
+header > .container > button { position: relative; z-index: 60; border-radius: 999px; border: 1px solid rgba(116,108,191,.28); background: rgba(255,255,255,.02); color: #9897a6; }
+header > .container > button:hover { border-color: rgba(138,77,255,.5); background: rgba(138,77,255,.1); color: #fff; }
 
 .utility-panel nav { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0 1.5rem; }
 .utility-panel nav > a { min-height: 3.75rem; display: flex; align-items: center; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
@@ -235,6 +236,83 @@ header > .container > button { position: relative; z-index: 60; }
   .utility-panel nav { display: flex; gap: 0; }
   .utility-panel nav > a { min-height: 3.25rem; }
   .site-footer__cta-note { margin-top: .25rem; }
+}
+
+/* Reference-aligned component system */
+:where(.link-arrow, .form-submit, .utility-toggle, header .container > div:last-of-type > a) {
+  border-radius: 999px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+:where(.link-arrow, .form-submit, .utility-toggle, header .container > div:last-of-type > a):focus-visible {
+  outline: 2px solid #9c62ff;
+  outline-offset: 4px;
+}
+.link-arrow, .form-submit {
+  min-height: 48px;
+  padding: .82rem 1.35rem;
+  gap: .65rem;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+}
+.link-arrow svg, .form-submit svg { width: 15px; height: 15px; transition: transform .2s ease; }
+.link-arrow:hover svg, .form-submit:hover svg { transform: translate(3px, -2px); }
+.link-arrow:active, .form-submit:active { transform: translateY(1px); }
+.link-arrow:not(.text-\[var\(--muted\)\]), .form-submit {
+  border-color: transparent !important;
+  background: linear-gradient(110deg, #8b4dff, #734cf5 58%, #5e72ff) !important;
+  box-shadow: 0 10px 24px rgba(105, 64, 230, .2) !important;
+  color: #fff !important;
+}
+.link-arrow:not(.text-\[var\(--muted\)\]):hover, .form-submit:hover {
+  border-color: transparent;
+  background: linear-gradient(110deg, #9a66ff, #725cff 58%, #6f83ff);
+  box-shadow: 0 14px 30px rgba(105, 64, 230, .32);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.link-arrow.text-\[var\(--muted\)\] {
+  min-height: 44px;
+  border-color: rgba(116,108,191,.2);
+  background: rgba(255,255,255,.015);
+  padding-inline: 1.05rem;
+  color: #9795a8;
+}
+.link-arrow.text-\[var\(--muted\)\]:hover {
+  border-color: rgba(138,77,255,.42);
+  background: rgba(138,77,255,.1);
+  color: #fff;
+  transform: translateY(-2px);
+}
+header .container > div:last-of-type > a {
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: 999px !important;
+  background: linear-gradient(110deg, #8b4dff, #734cf5 58%, #5e72ff) !important;
+  padding: .72rem 1.15rem;
+  color: #fff !important;
+}
+header .container > div:last-of-type > button {
+  min-height: 42px;
+  border: 1px solid rgba(116,108,191,.2);
+  border-radius: 999px;
+  background: rgba(255,255,255,.02);
+  padding-inline: .9rem;
+  color: #9897a6;
+}
+header .container > div:last-of-type > button:hover { border-color: rgba(138,77,255,.42); background: rgba(138,77,255,.1); color: #fff; }
+header .container > div:last-of-type > a:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(105,64,230,.26); }
+.utility-toggle { width: 42px; height: 42px; border-radius: 999px; }
+.site-footer__cta-note { min-height: 44px; border: 0; padding-top: 0; }
+.faq-list summary { position: relative; min-height: 70px; border-bottom: 1px solid rgba(116,108,191,.18); padding: 1.2rem 0; transition: color .2s ease, padding .2s ease, border-color .2s ease; }
+.faq-list summary:hover { border-color: rgba(138,77,255,.48); padding-inline: .65rem; color: #fff; }
+.faq-list summary span { transition: transform .25s ease, background .25s ease; }
+.faq-list details[open] summary span { transform: rotate(45deg); background: rgba(138,77,255,.16); }
+.pricing-row .link-arrow { justify-self: end; }
+@media (max-width: 767px) {
+  .link-arrow, .form-submit { min-height: 48px; }
+  .pricing-row .link-arrow, .contact-form .form-submit { justify-self: start; }
+  .faq-list summary:hover { padding-inline: .35rem; }
 }
 
 a { color: inherit; text-decoration: none; }
