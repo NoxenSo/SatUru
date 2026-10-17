@@ -114,8 +114,10 @@ main > section:nth-child(6) h3 { font-size: clamp(1.5rem, 2.5vw, 2.25rem); }
 .container { width: min(var(--container-max), calc(100% - 80px)); }
 body { background: radial-gradient(ellipse at 90% 0%, color-mix(in srgb, var(--accent-soft) 32%, transparent), transparent 34%), var(--bg); }
 header { border-color: color-mix(in srgb, var(--line) 82%, var(--accent)); background: color-mix(in srgb, var(--bg) 82%, transparent) !important; }
-header .container { min-height: 78px; flex-wrap: nowrap; }
-header .container > a:first-child { flex: 0 0 auto; }
+header .container { display: flex !important; min-height: 78px; flex-wrap: nowrap !important; flex-direction: row; }
+header .container > a:first-child { flex: 0 0 auto; font-size: 15px; letter-spacing: -.045em; }
+header .container > a:first-child span { color: #8c8a98; }
+header .container > a:first-child::after { content: '•'; margin-left: .35rem; color: #8a4dff; font-size: .8em; }
 header nav { flex: 1 1 auto; justify-content: center; gap: 2.2rem; }
 header .container > div:last-of-type { flex: 0 0 auto; }
 @media (max-width: 1100px) and (min-width: 768px) { header nav { gap: 1rem; } header .container { width: calc(100% - 48px); } }
@@ -171,7 +173,15 @@ main > section:first-child::before { content: ''; position: absolute; inset: 0; 
 main > section:first-child .container { position: relative; z-index: 1; }
 main > section:first-child .eyebrow { border: 1px solid rgba(138, 77, 255, .35); border-radius: 999px; padding: .7rem 1.1rem; background: rgba(91, 47, 167, .12); color: #9b72ff; }
 main > section:first-child .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg, #bda2ff, var(--ref-purple)); box-shadow: 0 0 12px rgba(138,77,255,.8); }
-main > section:first-child h1 { max-width: 8.5ch; font-weight: 700; letter-spacing: -.08em; text-shadow: 0 18px 45px rgba(57, 31, 125, .22); }
+main > section:first-child h1 { max-width: 9.25ch; font-family: 'Manrope', sans-serif; font-weight: 800; letter-spacing: -.075em; text-shadow: 0 18px 45px rgba(57, 31, 125, .22); }
+main > section:first-child h1 > span { display: block; }
+main > section:first-child h1 .hero-title-accent { background: linear-gradient(100deg, #9c62ff 0%, #6f75ff 68%, #5e95ff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+main > section:first-child .reveal { max-width: 760px; }
+main > section:first-child .reveal > .mt-12 { max-width: 700px; }
+main > section:first-child .reveal > .mt-12 p { font-size: 1rem; line-height: 1.7; }
+main > section:first-child .reveal > .mt-10 { max-width: 680px; }
+@media (min-width: 768px) { main > section:first-child .reveal > .mt-10 { gap: 2.5rem; } }
+
 main > section:first-child h1::first-letter { color: var(--fg); }
 main > section:first-child .reveal > .mt-12 p { color: #9a9aaa; max-width: 38rem; }
 main > section:first-child .hero-visual { opacity: .5; }
@@ -194,7 +204,10 @@ main > section:first-child .reveal > .mt-10 span { color: #848394; }
 .site-footer__cta { background: linear-gradient(115deg, rgba(31, 21, 58, .62), rgba(12, 17, 34, .3)); border-color: rgba(116,108,191,.2); }
 @media (max-width: 767px) {
   main > section:first-child .eyebrow { padding: .6rem .85rem; }
-  main > section:first-child h1 { font-size: clamp(3.4rem, 15vw, 5.3rem); }
+  main > section:first-child h1 { max-width: 8.5ch; font-size: clamp(3.4rem, 15vw, 5.3rem); }
+  main > section:first-child .reveal { max-width: none; }
+  main > section:first-child .reveal > .mt-12 { max-width: none; }
+
   main > section:first-child .link-arrow:first-child, main > section:first-child .link-arrow + .link-arrow { width: 100%; justify-content: center; }
 }
 
@@ -202,7 +215,8 @@ main > section:first-child .reveal > .mt-10 span { color: #848394; }
 /* Hero utility branch + quiet editorial footer */
 header { position: sticky !important; top: 0; z-index: 50; }
 header > .container { position: relative; z-index: 51; }
-.utility-toggle, header .md\\:hidden { position: relative; z-index: 60; }
+.utility-toggle { position: relative; z-index: 60; }
+header > .container > button { position: relative; z-index: 60; }
 
 .utility-panel nav { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0 1.5rem; }
 .utility-panel nav > a { min-height: 3.75rem; display: flex; align-items: center; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
