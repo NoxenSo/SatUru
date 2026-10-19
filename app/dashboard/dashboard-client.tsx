@@ -1,5 +1,0 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-export function DashboardClient({ email }: { email: string }) { const router=useRouter(); async function logout(){ await createClient().auth.signOut(); router.push('/') } return <main className="dashboard-page"><div className="dashboard-shell"><header className="dashboard-header"><a href="/" className="auth-brand"><span className="auth-mark">S</span> SatUru<span className="auth-dot">•</span></a><button className="dashboard-logout" onClick={logout}>Выйти</button></header><section className="dashboard-hero"><span className="eyebrow">Client space</span><h1>Ваше пространство<br /><span>SatUru Studio.</span></h1><p>{email}</p></section><div className="dashboard-grid"><article><span>01</span><h2>Проекты</h2><p>Здесь будут ваши активные проекты и результаты.</p></article><article><span>02</span><h2>Сообщения</h2><p>История общения с командой SatUru Studio.</p></article><article><span>03</span><h2>Профиль</h2><p>Управляйте данными и настройками аккаунта.</p></article></div></div></main> }
