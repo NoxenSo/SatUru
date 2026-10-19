@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --dir SatUruStudio/artifacts/saturu-studio dev",
+    "dev": "cd SatUruStudio/artifacts/saturu-studio && exec pnpm exec vite --config vite.config.ts --host 0.0.0.0",
     "build": "pnpm --dir SatUruStudio run build",
     "typecheck": "pnpm --dir SatUruStudio run typecheck"
   }
