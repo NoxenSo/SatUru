@@ -1,0 +1,10 @@
+{
+  "name": "saturu-studio-preview",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --dir SatUruStudio/artifacts/saturu-studio dev",
+    "build": "pnpm --dir SatUruStudio run build",
+    "typecheck": "pnpm --dir SatUruStudio run typecheck"
+  }
+}
