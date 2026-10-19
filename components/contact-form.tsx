@@ -9,10 +9,22 @@ export function ContactForm() {
     event.preventDefault();
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    const subject = encodeURIComponent(`Project request: ${data.get('projectType') || 'SatUru Studio'}`);
+    const body = encodeURIComponent([
+      `Name: ${data.get('name')}`,
+      `Email: ${data.get('email')}`,
+      `Telegram: ${data.get('telegram') || '-'}`,
+      `Budget: ${data.get('budget') || '-'}`,
+      `Deadline: ${data.get('deadline') || '-'}`,
+      '',
+      String(data.get('description') || ''),
+    ].join('\\n'));
+    window.location.href = `mailto:hello@saturu.studio?subject=${subject}&body=${body}`;
     setSubmitted(true);
   }
 
-  if (submitted) return <p className="form-status" role="status">Form ready for backend integration.</p>;
+  if (submitted) return <p className="form-status" role="status">Заявка подготовлена. Почтовый клиент открыт для отправки.</p>;
 
   return <form className="contact-form" onSubmit={handleSubmit} noValidate>
     <label>Name<input name="name" required placeholder="Your name" /></label>

@@ -6,54 +6,59 @@ import { Menu, X, Sun, Moon, ArrowUpRight } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Lang, copy } from '@/data/content';
 
+const nav = [
+  ['/#services', 'services'],
+  ['/#pricing', 'pricing'],
+  ['/work', 'work'],
+  ['/#process', 'process'],
+  ['/#contact', 'contact'],
+] as const;
+
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<Lang>('ru');
-  const [currency, setCurrency] = useState('RUB');
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
   const t = copy[lang];
-  const close = () => setOpen(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false);
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   return <>
-    <header className="sticky top-0 z-40 border-b rule bg-[color-mix(in_srgb,var(--bg)_94%,transparent)] backdrop-blur-md">
-      <div className="container flex h-16 items-center justify-between gap-6">
-        <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight" onClick={close}>
-          <span aria-hidden="true" className="relative grid size-6 place-items-center border border-current text-[9px] after:absolute after:-right-1 after:top-1/2 after:h-2 after:w-3 after:-translate-y-1/2 after:rounded-[50%] after:border-t after:border-current"></span>
-          SatUru <span className="font-normal text-[var(--muted)]">Studio</span>
+    <header className={`site-header ${scrolled ? 'site-header--scrolled' : ''}`}>
+      <div className="container site-header__inner">
+        <Link href="/" className="site-logo" onClick={() => setOpen(false)} aria-label="SatUru Studio — home">
+          Sat<span>Uru</span><b> Studi</b><i aria-hidden="true" />
         </Link>
-        <nav className="hidden items-center gap-8 text-[13px] text-[var(--muted)] md:flex" aria-label="Primary navigation">
-          <Link className="transition-colors hover:text-[var(--fg)]" href="/work">{lang === 'ru' ? 'Работы' : 'Work'}</Link>
-          <Link className="transition-colors hover:text-[var(--fg)]" href="/services">{lang === 'ru' ? 'Услуги' : 'Services'}</Link>
-          <Link className="transition-colors hover:text-[var(--fg)]" href="/about">{lang === 'ru' ? 'О студии' : 'About'}</Link>
-          <Link className="transition-colors hover:text-[var(--fg)]" href="/contact">{lang === 'ru' ? 'Контакт' : 'Contact'}</Link>
+        <nav className="site-nav" aria-label="Primary navigation">
+          {nav.map(([href, key]) => <Link key={key} href={href}>{key === 'services' ? t.nav.services : key === 'work' ? t.nav.work : key === 'contact' ? t.nav.contact : key === 'pricing' ? (lang === 'ru' ? 'Цены' : 'Pricing') : (lang === 'ru' ? 'Процесс' : 'Process')}</Link>)}
         </nav>
-        <div className="hidden items-center gap-4 text-[11px] md:flex">
-          <button onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')} className="tracking-wider" aria-label="Switch language">{lang.toUpperCase()} <span className="text-[var(--muted)]">/ {lang === 'ru' ? 'EN' : 'RU'}</span></button>
-          <button onClick={() => setCurrency(currency === 'RUB' ? 'USD' : 'RUB')} className="text-[var(--muted)]" aria-label="Switch currency">{currency}</button>
-          <button aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="border-l rule pl-4 text-[var(--muted)]">{mounted ? (theme === 'dark' ? <Sun /> : <Moon />) : <span aria-hidden="true" className="inline-block size-6" />}</button>
-          <Link className="ml-2 inline-flex items-center gap-2 border border-[var(--fg)] px-4 py-2 transition-colors hover:bg-[var(--fg)] hover:text-[var(--bg)]" href="/contact">{t.start} <ArrowUpRight /></Link><button className="utility-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Close utility menu' : 'Open utility menu'}>{open ? <X /> : <Menu />}</button>
+        <div className="site-controls">
+          <button className="language-toggle" onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')} aria-label="Toggle language">{lang.toUpperCase()}</button>
+          <button className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Toggle theme">{mounted && (theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />)}</button>
+          <Link className="header-cta" href="/contact">{t.start}<ArrowUpRight size={14} /></Link>
         </div>
-        <button className="md:hidden" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X /> : <Menu />}</button>
+        <button className="mobile-menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X size={18} /> : <Menu size={18} />}</button>
       </div>
-      {open && <div className="utility-panel border-t rule"><nav className="container flex flex-col gap-5 py-6 text-lg" aria-label="Mobile navigation">
-        <Link href="/work" onClick={close}>{lang === 'ru' ? 'Работы' : 'Work'}</Link><Link href="/services" onClick={close}>{lang === 'ru' ? 'Услуги' : 'Services'}</Link><Link href="/#process" onClick={close}>{lang === 'ru' ? 'Процесс' : 'Process'}</Link><Link href="/about" onClick={close}>{lang === 'ru' ? 'О студии' : 'About'}</Link><Link href="/#faq" onClick={close}>{lang === 'ru' ? 'ЧаВо' : 'FAQ'}</Link><Link href="/contact" onClick={close}>{lang === 'ru' ? 'Контакт' : 'Contact'}</Link>
-        <div className="flex items-center gap-5 border-t rule pt-5 text-xs text-[var(--muted)]"><button onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}>{lang.toUpperCase()} / {lang === 'ru' ? 'EN' : 'RU'}</button><button onClick={() => setCurrency(currency === 'RUB' ? 'USD' : 'RUB')}>{currency}</button><button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{mounted ? (theme === 'dark' ? 'Light theme' : 'Dark theme') : 'Theme'}</button></div>
-        <Link className="inline-flex w-fit items-center gap-2 border border-[var(--fg)] px-4 py-3 text-sm" href="/contact" onClick={close}>{t.start} <ArrowUpRight /></Link>
-      </nav></div>}
+      {open && <div className="mobile-nav-panel"><nav className="container" aria-label="Mobile navigation">{nav.map(([href, key]) => <Link key={key} href={href} onClick={() => setOpen(false)}>{key === 'services' ? t.nav.services : key === 'work' ? t.nav.work : key === 'contact' ? t.nav.contact : key === 'pricing' ? (lang === 'ru' ? 'Цены' : 'Pricing') : (lang === 'ru' ? 'Процесс' : 'Process')}<ArrowUpRight size={15} /></Link>)}<div className="mobile-nav-controls"><button onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}>{lang.toUpperCase()} / {lang === 'ru' ? 'EN' : 'RU'}</button><button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{mounted && (theme === 'dark' ? 'Light theme' : 'Dark theme')}</button></div></nav></div>}
     </header>
     {children}
   </>;
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) { return <>{children}</>; }
+
 export function Footer() {
-  const [lang, setLang] = useState<Lang>('ru');
-  const [currency, setCurrency] = useState('RUB');
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  return <footer className="site-footer border-t rule"><div className="site-footer__cta"><div className="container"><div className="eyebrow">Let&apos;s work together</div><div className="site-footer__cta-row"><div><h2>Есть идея?<br/>Давайте её реализуем.</h2><p>Digital products, design and development with purpose.</p></div><span className="site-footer__cta-note">SatUru Studio / Independent digital practice</span></div></div></div><div className="container site-footer__grid py-14 grid gap-12 md:grid-cols-[1fr_auto_auto]"><div><div className="text-sm font-semibold">SatUru Studio</div><p className="mt-4 max-w-xs text-sm leading-relaxed text-[var(--muted)]">Digital products, design and development with purpose.</p><div className="mt-7 flex flex-wrap gap-4 text-xs text-[var(--muted)]"><button onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')} aria-label="Switch language">{lang.toUpperCase()} / {lang === 'ru' ? 'EN' : 'RU'}</button><button onClick={() => setCurrency(currency === 'RUB' ? 'USD' : 'RUB')} aria-label="Switch currency">{currency}</button><button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Toggle theme">{mounted ? (theme === 'dark' ? 'Light' : 'Dark') : 'Theme'}</button></div></div><div className="grid grid-cols-2 gap-12 text-sm"><div className="flex flex-col gap-3"><span className="eyebrow">Navigate</span><Link href="/services">Services</Link><Link href="/work">Work</Link><Link href="/about">About</Link><Link href="/contact">Contact</Link></div><div className="flex flex-col gap-3"><span className="eyebrow">Legal</span><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/cookies">Cookies</Link></div></div><div className="md:text-right"><div className="flex flex-col gap-3"><span className="eyebrow">Contact</span><a className="text-sm underline underline-offset-4" href="mailto:hello@saturu.studio">hello@saturu.studio</a><span className="text-xs text-[var(--muted)]">Available for selected projects</span></div><p className="mt-10 text-xs text-[var(--muted)]">© 2026 SatUru Studio</p></div></div></footer>;
+  return <footer className="site-footer border-t rule"><div className="site-footer__cta"><div className="container"><div className="eyebrow">Let&apos;s work together</div><div className="site-footer__cta-row"><div><h2>Есть идея?<br />Давайте её реализуем.</h2><p>Digital products, design and development with purpose.</p></div><Link className="site-footer__cta-button" href="/contact">Начать проект <ArrowUpRight size={15} /></Link></div></div></div><div className="container site-footer__grid"><div><div className="site-logo">Sat<span>Uru</span><b> Studio</b></div><p>Independent digital practice for products, interfaces and systems.</p></div><nav><span className="eyebrow">Navigate</span><Link href="/services">Services</Link><Link href="/work">Work</Link><Link href="/about">About</Link><Link href="/contact">Contact</Link></nav><div><span className="eyebrow">Contact</span><a href="mailto:hello@saturu.studio">hello@saturu.studio</a><span>Available for selected projects</span></div></div></footer>;
 }
-export function Arrow() { return <ArrowUpRight />; }
