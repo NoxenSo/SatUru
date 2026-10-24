@@ -19,7 +19,11 @@ var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require
   throw Error('Dynamic require of "' + x + '" is not supported');
 });
 var __commonJS = (cb, mod) => function __require2() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
 };
 var __export = (target, all) => {
   for (var name in all)
@@ -17410,9 +17414,9 @@ var require_side_channel = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/formats.js
+// ../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/formats.js
 var require_formats = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/formats.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/formats.js"(exports, module) {
     "use strict";
     var replace = String.prototype.replace;
     var percentTwenties = /%20/g;
@@ -17436,12 +17440,13 @@ var require_formats = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/utils.js
+// ../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/utils.js
 var require_utils2 = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/utils.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/utils.js"(exports, module) {
     "use strict";
     var formats = require_formats();
     var getSideChannel = require_side_channel();
+    var defineProperty = require_es_define_property();
     var has = Object.prototype.hasOwnProperty;
     var isArray = Array.isArray;
     var overflowChannel = getSideChannel();
@@ -17457,6 +17462,17 @@ var require_utils2 = __commonJS({
     };
     var setMaxIndex = function setMaxIndex2(obj, maxIndex) {
       overflowChannel.set(obj, maxIndex);
+    };
+    var conflictChannel = getSideChannel();
+    var markConflict = function markConflict2(obj, maxIndex) {
+      conflictChannel.set(obj, maxIndex);
+      return obj;
+    };
+    var isConflict = function isConflict2(obj) {
+      return conflictChannel.has(obj);
+    };
+    var getConflictIndex = function getConflictIndex2(obj) {
+      return conflictChannel.get(obj);
     };
     var hexTable = (function() {
       var array2 = [];
@@ -17489,6 +17505,39 @@ var require_utils2 = __commonJS({
       }
       return obj;
     };
+    var setProperty = function setProperty2(obj, key, value) {
+      if (key === "__proto__" && defineProperty) {
+        defineProperty(obj, key, {
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        });
+      } else {
+        obj[key] = value;
+      }
+    };
+    var maxNumericIndex = function maxNumericIndex2(obj, min) {
+      var max = min;
+      var keys = Object.keys(obj);
+      for (var i = 0; i < keys.length; ++i) {
+        var num = parseInt(keys[i], 10);
+        if (String(num) === keys[i] && num > max) {
+          max = num;
+        }
+      }
+      return max;
+    };
+    var limitedPair = function limitedPair2(first, second, options) {
+      var pair = [first, second];
+      if (options && typeof options.arrayLimit === "number" && pair.length > options.arrayLimit) {
+        if (options.throwOnLimitExceeded) {
+          throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+        }
+        return markOverflow(arrayToObject(pair, options), 1);
+      }
+      return pair;
+    };
     var merge2 = function merge3(target, source, options) {
       if (!source) {
         return target;
@@ -17496,7 +17545,10 @@ var require_utils2 = __commonJS({
       if (typeof source !== "object" && typeof source !== "function") {
         if (isArray(target)) {
           var nextIndex = target.length;
-          if (options && typeof options.arrayLimit === "number" && nextIndex > options.arrayLimit) {
+          if (options && typeof options.arrayLimit === "number" && nextIndex >= options.arrayLimit) {
+            if (options.throwOnLimitExceeded) {
+              throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+            }
             return markOverflow(arrayToObject(target.concat(source), options), nextIndex);
           }
           target[nextIndex] = source;
@@ -17505,13 +17557,21 @@ var require_utils2 = __commonJS({
             var newIndex = getMaxIndex(target) + 1;
             target[newIndex] = source;
             setMaxIndex(target, newIndex);
+          } else if (options && options.strictMerge && isConflict(target)) {
+            var nextConflict = getConflictIndex(target) + 1;
+            if (options.throwOnLimitExceeded && typeof options.arrayLimit === "number" && nextConflict >= options.arrayLimit) {
+              throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+            }
+            target[nextConflict] = source;
+            markConflict(target, nextConflict);
           } else if (options && options.strictMerge) {
-            return [target, source];
+            var conflict = limitedPair(target, source, options);
+            return isArray(conflict) ? markConflict(conflict, 1) : conflict;
           } else if (options && (options.plainObjects || options.allowPrototypes) || !has.call(Object.prototype, source)) {
             target[source] = true;
           }
         } else {
-          return [target, source];
+          return limitedPair(target, source, options);
         }
         return target;
       }
@@ -17527,6 +17587,9 @@ var require_utils2 = __commonJS({
         }
         var combined = [target].concat(source);
         if (options && typeof options.arrayLimit === "number" && combined.length > options.arrayLimit) {
+          if (options.throwOnLimitExceeded) {
+            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+          }
           return markOverflow(arrayToObject(combined, options), combined.length - 1);
         }
         return combined;
@@ -17534,6 +17597,9 @@ var require_utils2 = __commonJS({
       var mergeTarget = target;
       if (isArray(target) && !isArray(source)) {
         mergeTarget = arrayToObject(target, options);
+        if (isConflict(target)) {
+          markConflict(mergeTarget, target.length - 1);
+        }
       }
       if (isArray(target) && isArray(source)) {
         source.forEach(function(item, i) {
@@ -17548,17 +17614,23 @@ var require_utils2 = __commonJS({
             target[i] = item;
           }
         });
+        if (options && typeof options.arrayLimit === "number" && target.length > options.arrayLimit) {
+          if (options.throwOnLimitExceeded) {
+            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+          }
+          return markOverflow(arrayToObject(target, options), target.length - 1);
+        }
         return target;
       }
       return Object.keys(source).reduce(function(acc, key) {
         var value = source[key];
         if (has.call(acc, key)) {
-          acc[key] = merge3(acc[key], value, options);
+          setProperty(acc, key, merge3(acc[key], value, options));
         } else {
-          acc[key] = value;
+          setProperty(acc, key, value);
         }
         if (isOverflow(source) && !isOverflow(acc)) {
-          markOverflow(acc, getMaxIndex(source));
+          markOverflow(acc, maxNumericIndex(acc, getMaxIndex(source)));
         }
         if (isOverflow(acc)) {
           var keyNum = parseInt(key, 10);
@@ -17566,16 +17638,25 @@ var require_utils2 = __commonJS({
             setMaxIndex(acc, keyNum);
           }
         }
+        if (isConflict(acc)) {
+          var conflictKey = parseInt(key, 10);
+          if (String(conflictKey) === key && conflictKey > getConflictIndex(acc)) {
+            markConflict(acc, conflictKey);
+          }
+        }
         return acc;
       }, mergeTarget);
     };
     var assign = function assignSingleSource(target, source) {
       return Object.keys(source).reduce(function(acc, key) {
-        acc[key] = source[key];
+        setProperty(acc, key, source[key]);
         return acc;
       }, target);
     };
     var decode = function(str, defaultDecoder, charset) {
+      if (typeof str === "string" && str.indexOf("%") === -1) {
+        return str.indexOf("+") === -1 ? str : str.replace(/\+/g, " ");
+      }
       var strWithoutPlus = str.replace(/\+/g, " ");
       if (charset === "iso-8859-1") {
         return strWithoutPlus.replace(/%[0-9a-f]{2}/gi, unescape);
@@ -17586,6 +17667,52 @@ var require_utils2 = __commonJS({
         return strWithoutPlus;
       }
     };
+    var hasToPrimitive = typeof Symbol === "function" && typeof Symbol.toPrimitive === "symbol";
+    var arrayJoin = Array.prototype.join;
+    var arrayToString = Array.prototype.toString;
+    var objectToString = Object.prototype.toString;
+    var toCoercible = function toCoercible2(value, joining) {
+      if (!value || typeof value !== "object" && typeof value !== "function") {
+        return value;
+      }
+      if (hasToPrimitive && value[Symbol.toPrimitive] != null) {
+        return value;
+      }
+      if (isArray(value) && value.toString === arrayToString && value.join === arrayJoin) {
+        var ancestors = joining || getSideChannel();
+        if (ancestors.has(value)) {
+          return "";
+        }
+        ancestors.set(value, true);
+        var copy;
+        for (var i = 0; i < value.length; i += 1) {
+          var item = value[i];
+          var coerced = toCoercible2(item, ancestors);
+          if (!copy && coerced !== item) {
+            copy = [];
+            for (var j = 0; j < i; j += 1) {
+              copy[j] = value[j];
+            }
+          }
+          if (copy) {
+            copy[i] = coerced;
+          }
+        }
+        ancestors["delete"](value);
+        return copy || value;
+      }
+      if (typeof value.toString === "function") {
+        return value;
+      }
+      var valueOf = value.valueOf;
+      if (typeof valueOf === "function") {
+        var primitive = valueOf.call(value);
+        if (!primitive || typeof primitive !== "object" && typeof primitive !== "function") {
+          return String(primitive);
+        }
+      }
+      return objectToString.call(value);
+    };
     var limit = 1024;
     var encode = function encode2(str, defaultEncoder, charset, kind, format) {
       if (str.length === 0) {
@@ -17595,16 +17722,23 @@ var require_utils2 = __commonJS({
       if (typeof str === "symbol") {
         string4 = Symbol.prototype.toString.call(str);
       } else if (typeof str !== "string") {
-        string4 = String(str);
+        string4 = String(toCoercible(str));
       }
       if (charset === "iso-8859-1") {
         return escape(string4).replace(/%u[0-9a-f]{4}/gi, function($0) {
           return "%26%23" + parseInt($0.slice(2), 16) + "%3B";
-        });
+        }).replace(/\+/g, "%2B");
       }
       var out = "";
       for (var j = 0; j < string4.length; j += limit) {
         var segment = string4.length >= limit ? string4.slice(j, j + limit) : string4;
+        if (j + limit < string4.length) {
+          var last = segment.charCodeAt(segment.length - 1);
+          if (last >= 55296 && last <= 56319) {
+            segment = segment.slice(0, -1);
+            j -= 1;
+          }
+        }
         var arr = [];
         for (var i = 0; i < segment.length; ++i) {
           var c = segment.charCodeAt(i);
@@ -17634,7 +17768,7 @@ var require_utils2 = __commonJS({
     };
     var compact = function compact2(value) {
       var queue = [{ obj: { o: value }, prop: "o" }];
-      var refs = [];
+      var refs = getSideChannel();
       for (var i = 0; i < queue.length; ++i) {
         var item = queue[i];
         var obj = item.obj[item.prop];
@@ -17642,9 +17776,9 @@ var require_utils2 = __commonJS({
         for (var j = 0; j < keys.length; ++j) {
           var key = keys[j];
           var val = obj[key];
-          if (typeof val === "object" && val !== null && refs.indexOf(val) === -1) {
+          if (typeof val === "object" && val !== null && !refs.has(val)) {
             queue[queue.length] = { obj, prop: key };
-            refs[refs.length] = val;
+            refs.set(val, true);
           }
         }
       }
@@ -17658,17 +17792,27 @@ var require_utils2 = __commonJS({
       if (!obj || typeof obj !== "object") {
         return false;
       }
-      return !!(obj.constructor && obj.constructor.isBuffer && obj.constructor.isBuffer(obj));
+      return !!(obj.constructor && typeof obj.constructor.isBuffer === "function" && obj.constructor.isBuffer(obj));
     };
-    var combine = function combine2(a, b, arrayLimit, plainObjects) {
+    var combine = function combine2(a, b, arrayLimit, plainObjects, throwOnLimitExceeded) {
       if (isOverflow(a)) {
-        var newIndex = getMaxIndex(a) + 1;
-        a[newIndex] = b;
+        if (throwOnLimitExceeded) {
+          throw new RangeError("Array limit exceeded. Only " + arrayLimit + " element" + (arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+        }
+        var bValues = isArray(b) ? b : [b];
+        var newIndex = getMaxIndex(a);
+        for (var i = 0; i < bValues.length; ++i) {
+          newIndex += 1;
+          a[newIndex] = bValues[i];
+        }
         setMaxIndex(a, newIndex);
         return a;
       }
       var result = [].concat(a, b);
       if (result.length > arrayLimit) {
+        if (throwOnLimitExceeded) {
+          throw new RangeError("Array limit exceeded. Only " + arrayLimit + " element" + (arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+        }
         return markOverflow(arrayToObject(result, { plainObjects }), result.length - 1);
       }
       return result;
@@ -17695,14 +17839,15 @@ var require_utils2 = __commonJS({
       isRegExp,
       markOverflow,
       maybeMap,
-      merge: merge2
+      merge: merge2,
+      toCoercible
     };
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/stringify.js
+// ../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/stringify.js
 var require_stringify = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/stringify.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/stringify.js"(exports, module) {
     "use strict";
     var getSideChannel = require_side_channel();
     var utils = require_utils2();
@@ -17736,6 +17881,7 @@ var require_stringify = __commonJS({
       charsetSentinel: false,
       commaRoundTrip: false,
       delimiter: "&",
+      depth: Infinity,
       encode: true,
       encodeDotInKeys: false,
       encoder: utils.encode,
@@ -17755,8 +17901,11 @@ var require_stringify = __commonJS({
       return typeof v === "string" || typeof v === "number" || typeof v === "boolean" || typeof v === "symbol" || typeof v === "bigint";
     };
     var sentinel = {};
-    var stringify = function stringify2(object2, prefix, generateArrayPrefix, commaRoundTrip, allowEmptyArrays, strictNullHandling, skipNulls, encodeDotInKeys, encoder, filter, sort, allowDots, serializeDate, format, formatter, encodeValuesOnly, charset, sideChannel) {
+    var stringify = function stringify2(object2, prefix, generateArrayPrefix, commaRoundTrip, allowEmptyArrays, strictNullHandling, skipNulls, encodeDotInKeys, encoder, filter, sort, allowDots, serializeDate, format, formatter, encodeValuesOnly, charset, sideChannel, depth, currentDepth) {
       var obj = object2;
+      if (currentDepth > depth) {
+        throw new RangeError("Input depth exceeded depth option of " + depth);
+      }
       var tmpSc = sideChannel;
       var step = 0;
       var findFlag = false;
@@ -17774,9 +17923,8 @@ var require_stringify = __commonJS({
           step = 0;
         }
       }
-      if (typeof filter === "function") {
-        obj = filter(prefix, obj);
-      } else if (obj instanceof Date) {
+      obj = typeof filter === "function" ? filter(prefix, obj) : obj;
+      if (obj instanceof Date) {
         obj = serializeDate(obj);
       } else if (generateArrayPrefix === "comma" && isArray(obj)) {
         obj = utils.maybeMap(obj, function(value2) {
@@ -17807,19 +17955,19 @@ var require_stringify = __commonJS({
       if (generateArrayPrefix === "comma" && isArray(obj)) {
         if (encodeValuesOnly && encoder) {
           obj = utils.maybeMap(obj, function(v) {
-            return v == null ? v : encoder(v);
+            return v == null ? v : encoder(v, defaults2.encoder, charset, "value", format);
           });
         }
-        objKeys = [{ value: obj.length > 0 ? obj.join(",") || null : void 0 }];
+        objKeys = [{ value: obj.length > 0 ? utils.toCoercible(obj).join(",") || null : void 0 }];
       } else if (isArray(filter)) {
         objKeys = filter;
       } else {
         var keys = Object.keys(obj);
         objKeys = sort ? keys.sort(sort) : keys;
       }
-      var encodedPrefix = encodeDotInKeys ? String(prefix).replace(/\./g, "%2E") : String(prefix);
+      var encodedPrefix = String(prefix);
       var adjustedPrefix = commaRoundTrip && isArray(obj) && obj.length === 1 ? encodedPrefix + "[]" : encodedPrefix;
-      if (allowEmptyArrays && isArray(obj) && obj.length === 0) {
+      if (allowEmptyArrays && isArray(obj) && obj.length === 0 && Object.keys(obj).length === 0) {
         return adjustedPrefix + "[]";
       }
       for (var j = 0; j < objKeys.length; ++j) {
@@ -17851,7 +17999,9 @@ var require_stringify = __commonJS({
           formatter,
           encodeValuesOnly,
           charset,
-          valueSideChannel
+          valueSideChannel,
+          depth,
+          currentDepth + 1
         ));
       }
       return values;
@@ -17886,7 +18036,7 @@ var require_stringify = __commonJS({
         filter = opts.filter;
       }
       var arrayFormat;
-      if (opts.arrayFormat in arrayPrefixGenerators) {
+      if (has.call(arrayPrefixGenerators, opts.arrayFormat)) {
         arrayFormat = opts.arrayFormat;
       } else if ("indices" in opts) {
         arrayFormat = opts.indices ? "indices" : "repeat";
@@ -17906,6 +18056,7 @@ var require_stringify = __commonJS({
         charsetSentinel: typeof opts.charsetSentinel === "boolean" ? opts.charsetSentinel : defaults2.charsetSentinel,
         commaRoundTrip: !!opts.commaRoundTrip,
         delimiter: typeof opts.delimiter === "undefined" ? defaults2.delimiter : opts.delimiter,
+        depth: typeof opts.depth === "number" ? opts.depth : defaults2.depth,
         encode: typeof opts.encode === "boolean" ? opts.encode : defaults2.encode,
         encodeDotInKeys: typeof opts.encodeDotInKeys === "boolean" ? opts.encodeDotInKeys : defaults2.encodeDotInKeys,
         encoder: typeof opts.encoder === "function" ? opts.encoder : defaults2.encoder,
@@ -17953,9 +18104,10 @@ var require_stringify = __commonJS({
         if (options.skipNulls && value === null) {
           continue;
         }
+        var encodedKey = options.encodeDotInKeys ? String(key).replace(/\./g, "%2E") : String(key);
         pushToArray(keys, stringify(
           value,
-          key,
+          encodedKey,
           generateArrayPrefix,
           commaRoundTrip,
           options.allowEmptyArrays,
@@ -17971,7 +18123,9 @@ var require_stringify = __commonJS({
           options.formatter,
           options.encodeValuesOnly,
           options.charset,
-          sideChannel
+          sideChannel,
+          options.depth,
+          0
         ));
       }
       var joined = keys.join(options.delimiter);
@@ -17988,13 +18142,57 @@ var require_stringify = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/parse.js
+// ../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/parse.js
 var require_parse = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/parse.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/parse.js"(exports, module) {
     "use strict";
+    var getSideChannel = require_side_channel();
     var utils = require_utils2();
     var has = Object.prototype.hasOwnProperty;
     var isArray = Array.isArray;
+    var getPrototypeOf = Object.getPrototypeOf;
+    var isPlainContainer = function isPlainContainer2(value) {
+      if (!value || typeof value !== "object") {
+        return false;
+      }
+      if (isArray(value)) {
+        return true;
+      }
+      var proto = getPrototypeOf(value);
+      return proto === Object.prototype || proto === null;
+    };
+    var emptyCopyOf = function emptyCopyOf2(value) {
+      if (isArray(value)) {
+        var arr = [];
+        arr.length = value.length;
+        return arr;
+      }
+      return getPrototypeOf(value) === null ? { __proto__: null } : {};
+    };
+    var copyInput = function copyInput2(input) {
+      var copies = getSideChannel();
+      var result = {};
+      var queue = [{ source: input, target: result }];
+      for (var i = 0; i < queue.length; ++i) {
+        var source = queue[i].source;
+        var target = queue[i].target;
+        var keys = Object.keys(source);
+        for (var j = 0; j < keys.length; ++j) {
+          var value = source[keys[j]];
+          if (isPlainContainer(value)) {
+            if (!copies.has(value)) {
+              var copy = emptyCopyOf(value);
+              copies.set(value, copy);
+              queue[queue.length] = { source: value, target: copy };
+            }
+            target[keys[j]] = copies.get(value);
+          } else {
+            target[keys[j]] = value;
+          }
+        }
+      }
+      return result;
+    };
     var defaults2 = {
       allowDots: false,
       allowEmptyArrays: false,
@@ -18026,6 +18224,17 @@ var require_parse = __commonJS({
     };
     var parseArrayValue = function(val, options, currentArrayLength) {
       if (val && typeof val === "string" && options.comma && val.indexOf(",") > -1) {
+        if (options.throwOnLimitExceeded) {
+          var commaCount = 0;
+          var commaIndex = val.indexOf(",");
+          while (commaIndex > -1) {
+            commaCount += 1;
+            if (commaCount >= options.arrayLimit) {
+              throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+            }
+            commaIndex = val.indexOf(",", commaIndex + 1);
+          }
+        }
         return val.split(",");
       }
       if (options.throwOnLimitExceeded && currentArrayLength >= options.arrayLimit) {
@@ -18070,6 +18279,7 @@ var require_parse = __commonJS({
         var part = parts[i];
         var bracketEqualsPos = part.indexOf("]=");
         var pos = bracketEqualsPos === -1 ? part.indexOf("=") : bracketEqualsPos + 1;
+        var isEmptyBracketKey = pos > 1 && part.slice(pos - 2, pos) === "[]";
         var key;
         var val;
         if (pos === -1) {
@@ -18093,23 +18303,21 @@ var require_parse = __commonJS({
         if (val && options.interpretNumericEntities && charset === "iso-8859-1") {
           val = interpretNumericEntities(String(val));
         }
-        if (part.indexOf("[]=") > -1) {
+        if (isEmptyBracketKey) {
           val = isArray(val) ? [val] : val;
         }
         if (options.comma && isArray(val) && val.length > options.arrayLimit) {
-          if (options.throwOnLimitExceeded) {
-            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
-          }
-          val = utils.combine([], val, options.arrayLimit, options.plainObjects);
+          val = utils.combine([], val, options.arrayLimit, options.plainObjects, options.throwOnLimitExceeded);
         }
         if (key !== null) {
           var existing = has.call(obj, key);
-          if (existing && (options.duplicates === "combine" || part.indexOf("[]=") > -1)) {
+          if (existing && (options.duplicates === "combine" || isEmptyBracketKey)) {
             obj[key] = utils.combine(
               obj[key],
               val,
               options.arrayLimit,
-              options.plainObjects
+              options.plainObjects,
+              options.throwOnLimitExceeded
             );
           } else if (!existing || options.duplicates === "last") {
             obj[key] = val;
@@ -18136,7 +18344,8 @@ var require_parse = __commonJS({
               [],
               leaf,
               options.arrayLimit,
-              options.plainObjects
+              options.plainObjects,
+              options.throwOnLimitExceeded
             );
           }
         } else {
@@ -18163,8 +18372,35 @@ var require_parse = __commonJS({
       }
       return leaf;
     };
+    var topLevelDotsToBrackets = function topLevelDotsToBrackets2(key) {
+      var result = "";
+      var depth = 0;
+      for (var i = 0; i < key.length; i += 1) {
+        var cu = key.charCodeAt(i);
+        if (cu === 91) {
+          depth += 1;
+          result += "[";
+        } else if (cu === 93) {
+          if (depth > 0) {
+            depth -= 1;
+          }
+          result += "]";
+        } else if (cu === 46 && depth === 0 && i + 1 < key.length && key.charCodeAt(i + 1) !== 46 && key.charCodeAt(i + 1) !== 91) {
+          var start = i + 1;
+          var j = start;
+          while (j < key.length && key.charCodeAt(j) !== 46 && key.charCodeAt(j) !== 91) {
+            j += 1;
+          }
+          result += "[" + key.slice(start, j) + "]";
+          i = j - 1;
+        } else {
+          result += key.charAt(i);
+        }
+      }
+      return result;
+    };
     var splitKeyIntoSegments = function splitKeyIntoSegments2(originalKey, options) {
-      var key = options.allowDots ? originalKey.replace(/\.([^.[]+)/g, "[$1]") : originalKey;
+      var key = options.allowDots ? topLevelDotsToBrackets(originalKey) : originalKey;
       if (options.depth <= 0) {
         if (!options.plainObjects && has.call(Object.prototype, key)) {
           if (!options.allowPrototypes) {
@@ -18290,7 +18526,7 @@ var require_parse = __commonJS({
       if (str === "" || str === null || typeof str === "undefined") {
         return options.plainObjects ? { __proto__: null } : {};
       }
-      var tempObj = typeof str === "string" ? parseValues(str, options) : str;
+      var tempObj = typeof str === "string" ? parseValues(str, options) : copyInput(str);
       var obj = options.plainObjects ? { __proto__: null } : {};
       var keys = Object.keys(tempObj);
       for (var i = 0; i < keys.length; ++i) {
@@ -18306,9 +18542,9 @@ var require_parse = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/index.js
+// ../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/index.js
 var require_lib2 = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/index.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.16.1/node_modules/qs/lib/index.js"(exports, module) {
     "use strict";
     var stringify = require_stringify();
     var parse3 = require_parse();
@@ -18718,9 +18954,9 @@ var require_finalhandler = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/view.js
+// ../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/view.js
 var require_view = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/view.js"(exports, module) {
+  "../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/view.js"(exports, module) {
     "use strict";
     var debug = require_src()("express:view");
     var path = __require("node:path");
@@ -18808,110 +19044,6 @@ var require_view = __commonJS({
       } catch (e) {
         return void 0;
       }
-    }
-  }
-});
-
-// ../../node_modules/.pnpm/content-type@1.0.5/node_modules/content-type/index.js
-var require_content_type = __commonJS({
-  "../../node_modules/.pnpm/content-type@1.0.5/node_modules/content-type/index.js"(exports) {
-    "use strict";
-    var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g;
-    var TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
-    var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
-    var QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g;
-    var QUOTE_REGEXP = /([\\"])/g;
-    var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
-    exports.format = format;
-    exports.parse = parse3;
-    function format(obj) {
-      if (!obj || typeof obj !== "object") {
-        throw new TypeError("argument obj is required");
-      }
-      var parameters = obj.parameters;
-      var type = obj.type;
-      if (!type || !TYPE_REGEXP.test(type)) {
-        throw new TypeError("invalid type");
-      }
-      var string4 = type;
-      if (parameters && typeof parameters === "object") {
-        var param;
-        var params = Object.keys(parameters).sort();
-        for (var i = 0; i < params.length; i++) {
-          param = params[i];
-          if (!TOKEN_REGEXP.test(param)) {
-            throw new TypeError("invalid parameter name");
-          }
-          string4 += "; " + param + "=" + qstring(parameters[param]);
-        }
-      }
-      return string4;
-    }
-    function parse3(string4) {
-      if (!string4) {
-        throw new TypeError("argument string is required");
-      }
-      var header = typeof string4 === "object" ? getcontenttype(string4) : string4;
-      if (typeof header !== "string") {
-        throw new TypeError("argument string is required to be a string");
-      }
-      var index = header.indexOf(";");
-      var type = index !== -1 ? header.slice(0, index).trim() : header.trim();
-      if (!TYPE_REGEXP.test(type)) {
-        throw new TypeError("invalid media type");
-      }
-      var obj = new ContentType(type.toLowerCase());
-      if (index !== -1) {
-        var key;
-        var match;
-        var value;
-        PARAM_REGEXP.lastIndex = index;
-        while (match = PARAM_REGEXP.exec(header)) {
-          if (match.index !== index) {
-            throw new TypeError("invalid parameter format");
-          }
-          index += match[0].length;
-          key = match[1].toLowerCase();
-          value = match[2];
-          if (value.charCodeAt(0) === 34) {
-            value = value.slice(1, -1);
-            if (value.indexOf("\\") !== -1) {
-              value = value.replace(QESC_REGEXP, "$1");
-            }
-          }
-          obj.parameters[key] = value;
-        }
-        if (index !== header.length) {
-          throw new TypeError("invalid parameter format");
-        }
-      }
-      return obj;
-    }
-    function getcontenttype(obj) {
-      var header;
-      if (typeof obj.getHeader === "function") {
-        header = obj.getHeader("content-type");
-      } else if (typeof obj.headers === "object") {
-        header = obj.headers && obj.headers["content-type"];
-      }
-      if (typeof header !== "string") {
-        throw new TypeError("content-type header is missing from object");
-      }
-      return header;
-    }
-    function qstring(val) {
-      var str = String(val);
-      if (TOKEN_REGEXP.test(str)) {
-        return str;
-      }
-      if (str.length > 0 && !TEXT_REGEXP.test(str)) {
-        throw new TypeError("invalid parameter value");
-      }
-      return '"' + str.replace(QUOTE_REGEXP, "\\$1") + '"';
-    }
-    function ContentType(type) {
-      this.parameters = /* @__PURE__ */ Object.create(null);
-      this.type = type;
     }
   }
 });
@@ -19627,9 +19759,9 @@ var require_ipaddr = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/proxy-addr@2.0.7/node_modules/proxy-addr/index.js
+// ../../node_modules/.pnpm/proxy-addr@2.0.8/node_modules/proxy-addr/index.js
 var require_proxy_addr = __commonJS({
-  "../../node_modules/.pnpm/proxy-addr@2.0.7/node_modules/proxy-addr/index.js"(exports, module) {
+  "../../node_modules/.pnpm/proxy-addr@2.0.8/node_modules/proxy-addr/index.js"(exports, module) {
     "use strict";
     module.exports = proxyaddr;
     module.exports.all = alladdrs;
@@ -19741,6 +19873,9 @@ var require_proxy_addr = __commonJS({
       return function trust(addr) {
         if (!isip(addr)) return false;
         var ip = parseip(addr);
+        if (ip.kind() === "ipv6" && ip.isIPv4MappedAddress()) {
+          ip = ip.toIPv4Address();
+        }
         var ipconv;
         var kind = ip.kind();
         for (var i = 0; i < subnets.length; i++) {
@@ -19753,10 +19888,15 @@ var require_proxy_addr = __commonJS({
             if (subnetkind === "ipv4" && !ip.isIPv4MappedAddress()) {
               continue;
             }
+            if (subnetkind !== "ipv4" && !(subnetrange >= 96 && subnetip.isIPv4MappedAddress())) {
+              continue;
+            }
             if (!ipconv) {
               ipconv = subnetkind === "ipv4" ? ip.toIPv4Address() : ip.toIPv4MappedAddress();
             }
             trusted = ipconv;
+          } else if (kind === "ipv6" && subnetip.isIPv4MappedAddress()) {
+            continue;
           }
           if (trusted.match(subnetip, subnetrange)) {
             return true;
@@ -19773,12 +19913,20 @@ var require_proxy_addr = __commonJS({
       return function trust(addr) {
         if (!isip(addr)) return false;
         var ip = parseip(addr);
+        if (ip.kind() === "ipv6" && ip.isIPv4MappedAddress()) {
+          ip = ip.toIPv4Address();
+        }
         var kind = ip.kind();
         if (kind !== subnetkind) {
           if (subnetisipv4 && !ip.isIPv4MappedAddress()) {
             return false;
           }
+          if (!subnetisipv4 && !(subnetrange >= 96 && subnetip.isIPv4MappedAddress())) {
+            return false;
+          }
           ip = subnetisipv4 ? ip.toIPv4Address() : ip.toIPv4MappedAddress();
+        } else if (kind === "ipv6" && subnetip.isIPv4MappedAddress()) {
+          return false;
         }
         return ip.match(subnetip, subnetrange);
       };
@@ -19786,12 +19934,12 @@ var require_proxy_addr = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/utils.js
+// ../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/utils.js
 var require_utils3 = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/utils.js"(exports) {
+  "../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/utils.js"(exports) {
     "use strict";
     var { METHODS } = __require("node:http");
-    var contentType = require_content_type();
+    var contentType = require_dist();
     var etag = require_etag();
     var mime = require_mime_types();
     var proxyaddr = require_proxy_addr();
@@ -21035,9 +21183,9 @@ var require_router = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js
+// ../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/application.js
 var require_application = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js"(exports, module) {
+  "../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/application.js"(exports, module) {
     "use strict";
     var finalhandler = require_finalhandler();
     var debug = require_src()("express:application");
@@ -21242,7 +21390,7 @@ var require_application = __commonJS({
       var cache = this.cache;
       var done = callback;
       var engines = this.engines;
-      var opts = options;
+      var opts = options || {};
       var view;
       if (typeof options === "function") {
         done = options;
@@ -21284,7 +21432,7 @@ var require_application = __commonJS({
       return server.listen.apply(server, args);
     };
     function logerror(err) {
-      if (this.get("env") !== "test") console.error(err.stack || err.toString());
+      if (this.get("env") !== "test") console.error(err);
     }
     function tryRender(view, options, callback) {
       try {
@@ -22043,9 +22191,9 @@ var require_range_parser = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/request.js
+// ../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/request.js
 var require_request = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/request.js"(exports, module) {
+  "../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/request.js"(exports, module) {
     "use strict";
     var accepts = require_accepts();
     var isIP = __require("node:net").isIP;
@@ -22081,9 +22229,9 @@ var require_request = __commonJS({
       var accept = accepts(this);
       return accept.encodings.apply(accept, arguments);
     };
-    req.acceptsCharsets = function() {
-      var accept = accepts(this);
-      return accept.charsets.apply(accept, arguments);
+    req.acceptsCharsets = function(...charsets) {
+      const accept = accepts(this);
+      return accept.charsets(...charsets);
     };
     req.acceptsLanguages = function(...languages) {
       return accepts(this).languages(...languages);
@@ -22150,7 +22298,7 @@ var require_request = __commonJS({
       if (!val || !trust(this.socket.remoteAddress, 0)) {
         val = this.get("Host");
       } else if (val.indexOf(",") !== -1) {
-        val = val.substring(0, val.indexOf(",")).trimRight();
+        val = val.substring(0, val.indexOf(",")).trimEnd();
       }
       return val || void 0;
     });
@@ -22165,7 +22313,7 @@ var require_request = __commonJS({
       var method = this.method;
       var res = this.res;
       var status = res.statusCode;
-      if ("GET" !== method && "HEAD" !== method) return false;
+      if ("GET" !== method && "HEAD" !== method && "QUERY" !== method) return false;
       if (status >= 200 && status < 300 || 304 === status) {
         return fresh(this.headers, {
           "etag": res.get("ETag"),
@@ -22191,181 +22339,270 @@ var require_request = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/content-disposition@1.1.0/node_modules/content-disposition/index.js
-var require_content_disposition = __commonJS({
-  "../../node_modules/.pnpm/content-disposition@1.1.0/node_modules/content-disposition/index.js"(exports, module) {
+// ../../node_modules/.pnpm/content-disposition@2.0.1/node_modules/content-disposition/dist/index.js
+var require_dist3 = __commonJS({
+  "../../node_modules/.pnpm/content-disposition@2.0.1/node_modules/content-disposition/dist/index.js"(exports) {
     "use strict";
-    module.exports = contentDisposition;
-    module.exports.parse = parse3;
-    var utf8Decoder = new TextDecoder("utf-8");
-    var ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g;
-    var NON_LATIN1_REGEXP = /[^\x20-\x7e\xa0-\xff]/g;
-    var QESC_REGEXP = /\\([\u0000-\u007f])/g;
-    var QUOTE_REGEXP = /([\\"])/g;
-    var PARAM_REGEXP = /;[\x09\x20]*([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*=[\x09\x20]*("(?:[\x20!\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"|[!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*/g;
-    var TEXT_REGEXP = /^[\x20-\x7e\x80-\xff]+$/;
-    var TOKEN_REGEXP = /^[!#$%&'*+.0-9A-Z^_`a-z|~-]+$/;
-    var EXT_VALUE_REGEXP = /^([A-Za-z0-9!#$%&+\-^_`{}~]+)'(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)'((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+.^_`|~-])+)$/;
-    var DISPOSITION_TYPE_REGEXP = /^([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*(?:$|;)/;
-    function contentDisposition(filename, options) {
-      var opts = options || {};
-      var type = opts.type || "attachment";
-      var params = createparams(filename, opts.fallback);
-      return format(new ContentDisposition(type, params));
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.create = create;
+    exports.parse = parse3;
+    exports.decodeExtended = decodeExtended;
+    exports.format = format;
+    exports.encodeExtended = encodeExtended;
+    var NullObject = /* @__PURE__ */ (() => {
+      const C = function() {
+      };
+      C.prototype = /* @__PURE__ */ Object.create(null);
+      return C;
+    })();
+    function create(filename, options) {
+      const type = options?.type || "attachment";
+      const parameters = createParameters(filename, options?.fallback);
+      return format({ type, parameters }, { extended: false });
     }
-    function createparams(filename, fallback) {
-      if (filename === void 0) {
-        return;
-      }
-      var params = {};
-      if (typeof filename !== "string") {
-        throw new TypeError("filename must be a string");
-      }
-      if (fallback === void 0) {
-        fallback = true;
-      }
-      if (typeof fallback !== "string" && typeof fallback !== "boolean") {
-        throw new TypeError("fallback must be a string or boolean");
-      }
-      if (typeof fallback === "string" && NON_LATIN1_REGEXP.test(fallback)) {
-        throw new TypeError("fallback must be ISO-8859-1 string");
-      }
-      var name = basename(filename);
-      var isQuotedString = TEXT_REGEXP.test(name);
-      var fallbackName = typeof fallback !== "string" ? fallback && getlatin1(name) : basename(fallback);
-      var hasFallback = typeof fallbackName === "string" && fallbackName !== name;
-      if (hasFallback || !isQuotedString || hasHexEscape(name)) {
-        params["filename*"] = name;
-      }
-      if (isQuotedString || hasFallback) {
-        params.filename = hasFallback ? fallbackName : name;
-      }
-      return params;
-    }
-    function format(obj) {
-      var parameters = obj.parameters;
-      var type = obj.type;
-      if (!type || typeof type !== "string" || !TOKEN_REGEXP.test(type)) {
-        throw new TypeError("invalid type");
-      }
-      var string4 = String(type).toLowerCase();
-      if (parameters && typeof parameters === "object") {
-        var param;
-        var params = Object.keys(parameters).sort();
-        for (var i = 0; i < params.length; i++) {
-          param = params[i];
-          var val = param.slice(-1) === "*" ? ustring(parameters[param]) : qstring(parameters[param]);
-          string4 += "; " + param + "=" + val;
+    var SP = 32;
+    var HTAB = 9;
+    var SEMI = 59;
+    var EQ = 61;
+    var DQUOTE = 34;
+    var BSLASH = 92;
+    var ASTERISK = 42;
+    function parse3(header, options) {
+      const len = header.length;
+      const multipart = options?.multipart === true;
+      const extended = options?.extended !== false;
+      let index = skipOWS(header, 0, header.length);
+      const typeStart = index;
+      index = parseToken(header, index, len);
+      const typeEnd = trailingOWS(header, typeStart, index);
+      const type = header.slice(typeStart, typeEnd).toLowerCase();
+      const parameters = new NullObject();
+      parameter: while (index < len) {
+        index = skipOWS(header, index + 1, len);
+        const keyStart = index;
+        while (index < len) {
+          const char2 = header.charCodeAt(index);
+          if (char2 === SEMI)
+            continue parameter;
+          if (char2 === EQ) {
+            const keyEnd = trailingOWS(header, keyStart, index);
+            const key = header.slice(keyStart, keyEnd).toLowerCase();
+            index = skipOWS(header, index + 1, len);
+            if (index < len && header.charCodeAt(index) === DQUOTE) {
+              index++;
+              let value2 = "";
+              if (multipart) {
+                while (index < len) {
+                  const code = header.charCodeAt(index++);
+                  if (code === DQUOTE) {
+                    index = parseToken(header, index, len);
+                    if (parameters[key] === void 0)
+                      parameters[key] = value2;
+                    break;
+                  }
+                  if (code === /* % */
+                  37 && index + 1 < len) {
+                    const code2 = header.charCodeAt(index);
+                    const code3 = header.charCodeAt(index + 1);
+                    if (code2 === 50 && code3 === 50) {
+                      value2 += '"';
+                      index += 2;
+                      continue;
+                    }
+                    if (code2 === 48) {
+                      if (code3 === 100 || code3 === 68) {
+                        value2 += "\r";
+                        index += 2;
+                        continue;
+                      }
+                      if (code3 === 97 || code3 === 65) {
+                        value2 += "\n";
+                        index += 2;
+                        continue;
+                      }
+                    }
+                  }
+                  value2 += String.fromCharCode(code);
+                }
+              } else {
+                while (index < len) {
+                  const code = header.charCodeAt(index++);
+                  if (code === DQUOTE) {
+                    index = parseToken(header, index, len);
+                    if (parameters[key] === void 0)
+                      parameters[key] = value2;
+                    break;
+                  }
+                  if (code === BSLASH && index < len) {
+                    value2 += header[index++];
+                    continue;
+                  }
+                  value2 += String.fromCharCode(code);
+                }
+              }
+              continue parameter;
+            }
+            const valueStart = index;
+            index = parseToken(header, index, len);
+            const valueEnd = trailingOWS(header, valueStart, index);
+            const value = header.slice(valueStart, valueEnd);
+            if (parameters[key] === void 0) {
+              parameters[key] = value;
+              if (extended && key.charCodeAt(key.length - 1) === ASTERISK) {
+                const normalizedKey = key.slice(0, -1);
+                const decoded = decodeExtended(value);
+                if (decoded !== void 0)
+                  parameters[normalizedKey] = decoded;
+              }
+            }
+            continue parameter;
+          }
+          index++;
         }
       }
-      return string4;
+      return { type, parameters };
     }
-    function decodefield(str) {
-      const match = EXT_VALUE_REGEXP.exec(str);
-      if (!match) {
-        throw new TypeError("invalid extended field value");
+    var ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g;
+    var NON_ASCII_REGEXP = /[^\x20-\x7e]/g;
+    var QUOTE_REGEXP = /[\\"]/g;
+    var INVALID_FILENAME_REGEXP = /%[0-9A-Fa-f]{2}/;
+    var TEXT_REGEXP = /^[\x20-\x7e\x80-\xff]*$/;
+    var ASCII_TEXT_REGEXP = /^[\x20-\x7e]*$/;
+    var TOKEN_REGEXP = /^[!#$%&'*+.0-9A-Z^_`a-z|~-]+$/;
+    function createParameters(filename, fallback = true) {
+      if (filename === void 0)
+        return;
+      if (typeof fallback === "string") {
+        if (!ASCII_TEXT_REGEXP.test(fallback)) {
+          throw new TypeError("Fallback must be valid US-ASCII: " + fallback);
+        }
+        if (fallback === filename)
+          return { filename };
+        return { filename: fallback, "filename*": encodeExtended(filename) };
       }
-      const charset = match[1].toLowerCase();
-      const encoded = match[2];
+      if (ASCII_TEXT_REGEXP.test(filename) && !INVALID_FILENAME_REGEXP.test(filename)) {
+        return { filename };
+      }
+      if (fallback === false) {
+        return { "filename*": encodeExtended(filename) };
+      }
+      return {
+        filename: getAscii(filename),
+        "filename*": encodeExtended(filename)
+      };
+    }
+    function decodeExtended(str) {
+      const charsetEnd = str.indexOf("'");
+      if (charsetEnd <= 0) {
+        return void 0;
+      }
+      const languageEnd = str.indexOf("'", charsetEnd + 1);
+      if (languageEnd === -1) {
+        return void 0;
+      }
+      const charset = str.slice(0, charsetEnd).toLowerCase();
+      const encoded = str.slice(languageEnd + 1);
       switch (charset) {
         case "iso-8859-1": {
-          const binary = decodeHexEscapes(encoded);
-          return getlatin1(binary);
+          return decodeHexEscapes(encoded);
         }
         case "utf-8":
         case "utf8": {
-          try {
-            return decodeURIComponent(encoded);
-          } catch {
-            const binary = decodeHexEscapes(encoded);
-            const bytes = new Uint8Array(binary.length);
-            for (let idx = 0; idx < binary.length; idx++) {
-              bytes[idx] = binary.charCodeAt(idx);
-            }
-            return utf8Decoder.decode(bytes);
-          }
+          return tryDecodeURIComponent(encoded);
         }
       }
-      throw new TypeError("unsupported charset in extended field");
+      return void 0;
     }
-    function getlatin1(val) {
-      return String(val).replace(NON_LATIN1_REGEXP, "?");
-    }
-    function parse3(string4) {
-      if (!string4 || typeof string4 !== "string") {
-        throw new TypeError("argument string is required");
+    function tryDecodeURIComponent(str) {
+      try {
+        return decodeURIComponent(str);
+      } catch {
+        return void 0;
       }
-      var match = DISPOSITION_TYPE_REGEXP.exec(string4);
-      if (!match) {
-        throw new TypeError("invalid type format");
+    }
+    function parseToken(str, index, len) {
+      while (index < len) {
+        const char2 = str.charCodeAt(index);
+        if (char2 === SEMI)
+          break;
+        index++;
       }
-      var index = match[0].length;
-      var type = match[1].toLowerCase();
-      var key;
-      var names = [];
-      var params = {};
-      var value;
-      index = PARAM_REGEXP.lastIndex = match[0].slice(-1) === ";" ? index - 1 : index;
-      while (match = PARAM_REGEXP.exec(string4)) {
-        if (match.index !== index) {
-          throw new TypeError("invalid parameter format");
-        }
-        index += match[0].length;
-        key = match[1].toLowerCase();
-        value = match[2];
-        if (names.indexOf(key) !== -1) {
-          throw new TypeError("invalid duplicate parameter");
-        }
-        names.push(key);
-        if (key.indexOf("*") + 1 === key.length) {
-          key = key.slice(0, -1);
-          value = decodefield(value);
-          params[key] = value;
-          continue;
-        }
-        if (typeof params[key] === "string") {
-          continue;
-        }
-        if (value[0] === '"') {
-          value = value.slice(1, -1).replace(QESC_REGEXP, "$1");
-        }
-        params[key] = value;
+      return index;
+    }
+    function skipOWS(str, index, len) {
+      while (index < len) {
+        const char2 = str.charCodeAt(index);
+        if (char2 !== SP && char2 !== HTAB)
+          break;
+        index++;
       }
-      if (index !== -1 && index !== string4.length) {
-        throw new TypeError("invalid parameter format");
-      }
-      return new ContentDisposition(type, params);
+      return index;
     }
-    function pencode(char2) {
-      return "%" + String(char2).charCodeAt(0).toString(16).toUpperCase();
-    }
-    function qstring(val) {
-      var str = String(val);
-      return '"' + str.replace(QUOTE_REGEXP, "\\$1") + '"';
-    }
-    function ustring(val) {
-      var str = String(val);
-      var encoded = encodeURIComponent(str).replace(ENCODE_URL_ATTR_CHAR_REGEXP, pencode);
-      return "UTF-8''" + encoded;
-    }
-    function ContentDisposition(type, parameters) {
-      this.type = type;
-      this.parameters = parameters;
-    }
-    function basename(path) {
-      const normalized = path.replaceAll("\\", "/");
-      let end = normalized.length;
-      while (end > 0 && normalized[end - 1] === "/") {
+    function trailingOWS(str, start, end) {
+      while (end > start) {
+        const char2 = str.charCodeAt(end - 1);
+        if (char2 !== SP && char2 !== HTAB)
+          break;
         end--;
       }
-      if (end === 0) {
-        return "";
+      return end;
+    }
+    function format(obj, options) {
+      const { type, parameters } = obj;
+      const multipart = options?.multipart === true;
+      const extended = options?.extended !== false;
+      if (!type || !TOKEN_REGEXP.test(type)) {
+        throw new TypeError("Invalid type: " + type);
       }
-      let start = end - 1;
-      while (start >= 0 && normalized[start] !== "/") {
-        start--;
+      let result = type;
+      if (parameters) {
+        for (const param of Object.keys(parameters)) {
+          const value = parameters[param];
+          if (!TOKEN_REGEXP.test(param)) {
+            throw new TypeError("Invalid parameter name: " + param);
+          }
+          if (multipart) {
+            result += "; " + param + "=" + qmultipart(value);
+            continue;
+          }
+          if (TOKEN_REGEXP.test(value)) {
+            result += "; " + param + "=" + value;
+            continue;
+          }
+          if (TEXT_REGEXP.test(value)) {
+            result += "; " + param + "=" + qstring(value);
+            continue;
+          }
+          if (!extended) {
+            throw new TypeError("Invalid parameter value: " + value);
+          }
+          result += "; " + param + "*=" + encodeExtended(value);
+        }
       }
-      return normalized.slice(start + 1, end);
+      return result;
+    }
+    function getAscii(val) {
+      return val.replace(NON_ASCII_REGEXP, "?");
+    }
+    function pencode(char2) {
+      return "%" + char2.charCodeAt(0).toString(16).toUpperCase();
+    }
+    function qstring(str) {
+      return '"' + str.replace(QUOTE_REGEXP, "\\$&") + '"';
+    }
+    function qmultipart(str) {
+      return '"' + str.replace(/[\n\r"]/g, multipartEscape) + '"';
+    }
+    function multipartEscape(char2) {
+      if (char2 === "\n")
+        return "%0A";
+      if (char2 === "\r")
+        return "%0D";
+      return "%22";
+    }
+    function encodeExtended(str) {
+      const encoded = encodeURIComponent(str).replace(ENCODE_URL_ATTR_CHAR_REGEXP, pencode);
+      return "UTF-8''" + encoded;
     }
     function isHexDigit(char2) {
       const code = char2.charCodeAt(0);
@@ -22373,19 +22610,10 @@ var require_content_disposition = __commonJS({
       code >= 65 && code <= 70 || // A-F
       code >= 97 && code <= 102;
     }
-    function hasHexEscape(str) {
-      const maxIndex = str.length - 3;
-      let lastIndex = -1;
-      while ((lastIndex = str.indexOf("%", lastIndex + 1)) !== -1 && lastIndex <= maxIndex) {
-        if (isHexDigit(str[lastIndex + 1]) && isHexDigit(str[lastIndex + 2])) {
-          return true;
-        }
-      }
-      return false;
-    }
     function decodeHexEscapes(str) {
       const firstEscape = str.indexOf("%");
-      if (firstEscape === -1) return str;
+      if (firstEscape === -1)
+        return str;
       let result = str.slice(0, firstEscape);
       for (let idx = firstEscape; idx < str.length; idx++) {
         if (str[idx] === "%" && idx + 2 < str.length && isHexDigit(str[idx + 1]) && isHexDigit(str[idx + 2])) {
@@ -23140,11 +23368,11 @@ var require_vary = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/response.js
+// ../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/response.js
 var require_response = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/response.js"(exports, module) {
+  "../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/response.js"(exports, module) {
     "use strict";
-    var contentDisposition = require_content_disposition();
+    var contentDisposition = require_dist3();
     var createError = require_http_errors();
     var deprecate = require_depd()("express");
     var encodeUrl = require_encodeurl();
@@ -23163,6 +23391,7 @@ var require_response = __commonJS({
     var send = require_send();
     var extname = path.extname;
     var resolve = path.resolve;
+    var basename = path.basename;
     var vary = require_vary();
     var { Buffer: Buffer2 } = __require("node:buffer");
     var res = Object.create(http.ServerResponse.prototype);
@@ -23194,12 +23423,15 @@ var require_response = __commonJS({
       var chunk = body;
       var encoding;
       var req = this.req;
-      var type;
       var app2 = this.app;
       switch (typeof chunk) {
         // string defaulting to html
         case "string":
-          if (!this.get("Content-Type")) {
+          encoding = "utf8";
+          const type = this.get("Content-Type");
+          if (typeof type === "string") {
+            this.set("Content-Type", setCharset(type, "utf-8"));
+          } else {
             this.type("html");
           }
           break;
@@ -23217,13 +23449,6 @@ var require_response = __commonJS({
           }
           break;
       }
-      if (typeof chunk === "string") {
-        encoding = "utf8";
-        type = this.get("Content-Type");
-        if (typeof type === "string") {
-          this.set("Content-Type", setCharset(type, "utf-8"));
-        }
-      }
       var etagFn = app2.get("etag fn");
       var generateETag = !this.get("ETag") && typeof etagFn === "function";
       var len;
@@ -23237,7 +23462,9 @@ var require_response = __commonJS({
           encoding = void 0;
           len = chunk.length;
         }
-        this.set("Content-Length", len);
+        if (!this.get("Transfer-Encoding")) {
+          this.set("Content-Length", len);
+        }
       }
       var etag;
       if (generateETag && len !== void 0) {
@@ -23355,7 +23582,7 @@ var require_response = __commonJS({
         opts = filename;
       }
       var headers = {
-        "Content-Disposition": contentDisposition(name || path2)
+        "Content-Disposition": contentDisposition.create(basename(name || path2))
       };
       if (opts && opts.headers) {
         var keys = Object.keys(opts.headers);
@@ -23398,10 +23625,11 @@ var require_response = __commonJS({
       return this;
     };
     res.attachment = function attachment(filename) {
-      if (filename) {
-        this.type(extname(filename));
+      const name = filename !== void 0 ? basename(filename) : void 0;
+      if (name) {
+        this.type(extname(name));
       }
-      this.set("Content-Disposition", contentDisposition(filename));
+      this.set("Content-Disposition", contentDisposition.create(name));
       return this;
     };
     res.append = function append(field, val) {
@@ -23488,7 +23716,7 @@ var require_response = __commonJS({
         },
         html: function() {
           var u = escapeHtml(address);
-          body = "<p>" + statuses.message[status] + ". Redirecting to " + u + "</p>";
+          body = "<!DOCTYPE html><head><title>" + statuses.message[status] + "</title></head><body><p>" + statuses.message[status] + ". Redirecting to " + u + "</p></body>";
         },
         default: function() {
           body = "";
@@ -23714,9 +23942,9 @@ var require_serve_static = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/express.js
+// ../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/express.js
 var require_express = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/express.js"(exports, module) {
+  "../../node_modules/.pnpm/express@5.3.0/node_modules/express/lib/express.js"(exports, module) {
     "use strict";
     var bodyParser = require_body_parser();
     var EventEmitter = __require("node:events").EventEmitter;
@@ -23754,9 +23982,9 @@ var require_express = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/index.js
+// ../../node_modules/.pnpm/express@5.3.0/node_modules/express/index.js
 var require_express2 = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/index.js"(exports, module) {
+  "../../node_modules/.pnpm/express@5.3.0/node_modules/express/index.js"(exports, module) {
     "use strict";
     module.exports = require_express();
   }
@@ -34831,7 +35059,7 @@ var require_parser = __commonJS({
 });
 
 // ../../node_modules/.pnpm/pg-protocol@1.15.0/node_modules/pg-protocol/dist/index.js
-var require_dist3 = __commonJS({
+var require_dist4 = __commonJS({
   "../../node_modules/.pnpm/pg-protocol@1.15.0/node_modules/pg-protocol/dist/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -34934,7 +35162,7 @@ var require_connection = __commonJS({
   "../../node_modules/.pnpm/pg@8.22.0/node_modules/pg/lib/connection.js"(exports, module) {
     "use strict";
     var EventEmitter = __require("events").EventEmitter;
-    var { parse: parse3, serialize } = require_dist3();
+    var { parse: parse3, serialize } = require_dist4();
     var stream = require_stream();
     var { getStream } = stream;
     var flushBuffer = serialize.flush();
@@ -36906,7 +37134,7 @@ var require_lib5 = __commonJS({
     var utils = require_utils4();
     var Pool4 = require_pg_pool();
     var TypeOverrides2 = require_type_overrides();
-    var { DatabaseError: DatabaseError2 } = require_dist3();
+    var { DatabaseError: DatabaseError2 } = require_dist4();
     var { escapeIdentifier: escapeIdentifier2, escapeLiteral: escapeLiteral2 } = require_utils4();
     var poolFactory = (Client3) => {
       return class BoundPool extends Pool4 {
@@ -59825,7 +60053,6 @@ on-finished/index.js:
    *)
 
 content-type/dist/index.js:
-content-type/index.js:
   (*!
    * content-type
    * Copyright(c) 2015 Douglas Christopher Wilson
@@ -59999,7 +60226,7 @@ range-parser/index.js:
    * MIT Licensed
    *)
 
-content-disposition/index.js:
+content-disposition/dist/index.js:
   (*!
    * content-disposition
    * Copyright(c) 2014-2017 Douglas Christopher Wilson
